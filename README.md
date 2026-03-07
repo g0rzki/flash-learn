@@ -1,5 +1,4 @@
 # FlashLearn
-
 FlashLearn to innowacyjna aplikacja mobilna do nauki, która rozwiązuje problem nieefektywnego zapamiętywania poprzez wykorzystanie krzywej zapominania Ebbinghausa. System automatyzuje proces tworzenia materiałów dzięki AI oraz optymalizuje powtórki za pomocą algorytmu spaced repetition.
 
 ## Zespół
@@ -20,12 +19,130 @@ FlashLearn to innowacyjna aplikacja mobilna do nauki, która rozwiązuje problem
 ### Opis Architektury
 System opiera się na architekturze klient-serwer z podejściem **offline-first**. Aplikacja mobilna posiada lokalną bazę danych, która synchronizuje się z backendem (REST API) po odzyskaniu połączenia. Całość infrastruktury serwerowej jest skonteneryzowana przy użyciu Docker.
 
-
 ### Podział na moduły
 * **Moduł Mobilny:** Obsługa interfejsu (Compose), lokalna baza (Room) oraz implementacja algorytmu SM-2.
 * **Moduł AI:** Integracja z zewnętrznymi modelami w celu generowania fiszek z surowego tekstu.
 * **Moduł Synchronizacji:** Zarządzanie spójnością danych między urządzeniem a serwerem.
 * **Moduł Społecznościowy:** Marketplace umożliwiający udostępnianie i pobieranie publicznych talii.
+
+## Diagramy
+
+### Diagram przypadków użycia (SCRUM-10)
+```mermaid
+graph TD
+  subgraph Aktorzy
+    U[👤 Użytkownik]
+    AI[🤖 AI / LLM]
+    DB[(PostgreSQL)]
+  end
+
+  subgraph FlashLearn - Przypadki użycia
+    UC1(Rejestracja i logowanie)
+    UC2(Tworzenie talii fiszek)
+    UC3(Edycja i usuwanie fiszek)
+    UC4(Generowanie fiszek przez AI)
+    UC5(Sesja nauki z SM-2)
+    UC6(Ocena fiszki - Nie wiem / Trudne / Łatwe)
+    UC7(Przeglądanie statystyk)
+    UC8(Publikowanie talii w Marketplace)
+    UC9(Przeglądanie publicznych talii)
+    UC10(Klonowanie talii)
+  end
+
+  U --> UC1
+  U --> UC2
+  U --> UC3
+  U --> UC4
+  U --> UC5
+  UC5 --> UC6
+  U --> UC7
+  U --> UC8
+  U --> UC9
+  U --> UC10
+  UC4 --> AI
+  UC1 --> DB
+  UC2 --> DB
+  UC8 --> DB
+```
+
+### Diagram aktywności – generowanie fiszek AI (SCRUM-11)
+```mermaid
+flowchart TD
+  A([Start]) --> B[Użytkownik wkleja tekst]
+  B --> C[Kliknięcie: Generuj fiszki]
+  C --> D[Walidacja długości tekstu]
+  D -->|Zbyt krótki| E[Wyświetl błąd]
+  E --> B
+  D -->|OK| F[Wysłanie tekstu do API Spring Boot]
+  F --> G[Backend wysyła prompt do zewnętrznego LLM]
+  G --> H{LLM zwrócił odpowiedź?}
+  H -->|Timeout/Błąd| I[Wyświetl komunikat błędu]
+  I --> B
+  H -->|Tak| J[Parsowanie odpowiedzi JSON do listy fiszek]
+  J --> K[Wyświetlenie fiszek użytkownikowi do weryfikacji]
+  K --> L{Użytkownik edytuje fiszkę?}
+  L -->|Tak| M[Edycja pytania lub odpowiedzi]
+  M --> L
+  L -->|Nie / Gotowe| N{Akceptuj lub odrzuć}
+  N -->|Odrzuć| O[Fiszka usunięta z listy]
+  O --> L
+  N -->|Akceptuj wszystkie| P[Zapisanie fiszek do Room SQLite]
+  P --> Q[Synchronizacja z PostgreSQL w tle]
+  Q --> R([Koniec])
+```
+
+### Diagram sekwencji – sesja nauki SM-2 (SCRUM-12)
+```mermaid
+sequenceDiagram
+  actor Użytkownik
+  participant App as Android App (Kotlin)
+  participant SM2 as Silnik SM-2
+  participant Room as Baza Room (SQLite)
+  participant API as Backend (Spring Boot)
+
+  Użytkownik->>App: Rozpocznij sesję nauki
+  App->>Room: Pobierz fiszki z terminemPowtórki <= dziś
+  Room-->>App: Lista fiszek do powtórki
+
+  loop Dla każdej fiszki
+    App->>Użytkownik: Wyświetl pytanie
+    Użytkownik->>App: Odsłoń odpowiedź
+    Użytkownik->>App: Oceń: Nie wiem / Trudne / Łatwe
+    App->>SM2: Przelicz nowy interwał (ocena, poprzedni EF)
+    SM2-->>App: Nowa data powtórki + współczynnik EF
+    App->>Room: Zapisz zaktualizowaną fiszkę
+  end
+
+  App->>Użytkownik: Podsumowanie sesji (liczba fiszek, wyniki)
+  App->>API: Synchronizuj wyniki z serwerem (async)
+  API-->>App: 200 OK
+```
+
+### Diagram sekwencji – logowanie użytkownika (SCRUM-13)
+```mermaid
+sequenceDiagram
+  actor Użytkownik
+  participant App as Android App (Kotlin)
+  participant API as Backend (Spring Boot)
+  participant DB as PostgreSQL
+
+  Użytkownik->>App: Wprowadź email + hasło
+  App->>App: Walidacja formularza (lokalna)
+  App->>API: POST /auth/login {email, hasło}
+  API->>DB: Znajdź użytkownika po emailu
+  DB-->>API: Dane użytkownika (hash hasła)
+
+  alt Nieprawidłowe dane
+    API-->>App: 401 Unauthorized
+    App->>Użytkownik: Komunikat błędu
+  else Poprawne dane
+    API->>API: Weryfikacja hasła (bcrypt)
+    API->>API: Generuj JWT (access + refresh token)
+    API-->>App: 200 OK + {accessToken, refreshToken}
+    App->>App: Zapisz tokeny (Encrypted SharedPreferences)
+    App->>Użytkownik: Przekieruj na Dashboard
+  end
+```
 
 ## Uruchomienie lokalne
 
