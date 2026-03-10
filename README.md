@@ -1,42 +1,50 @@
 # FlashLearn
+
 FlashLearn to innowacyjna aplikacja mobilna do nauki, która rozwiązuje problem nieefektywnego zapamiętywania poprzez wykorzystanie krzywej zapominania Ebbinghausa. System automatyzuje proces tworzenia materiałów dzięki AI oraz optymalizuje powtórki za pomocą algorytmu spaced repetition.
 
 ## Wizja projektu
+
 Tradycyjne metody nauki są pasywne i nieefektywne, co sprawia, że człowiek zapomina większość nowego materiału w ciągu doby. FlashLearn rozwiązuje ten problem, automatyzując tworzenie fiszek przy pomocy AI i optymalizując proces powtórek algorytmem spaced repetition. Projekt ma na celu wyeliminowanie braków istniejących rozwiązań, takich jak przestarzałe interfejsy, brak synchronizacji czy konieczność ręcznego tworzenia materiałów.
 
 ## Opis MVP
-* **Generowanie fiszek przez AI**: Automatyczne tworzenie par pytanie/odpowiedź z surowego tekstu z opcją weryfikacji i edycji przed zapisaniem.
-* **Algorytm SM-2**: Personalizacja sesji nauki na podstawie ocen trudności (Nie wiem / Trudne / Łatwe) wystawianych przez użytkownika.
-* **Synchronizacja i Marketplace**: Bezpieczne zarządzanie kontami (JWT), synchronizacja z bazą PostgreSQL oraz platforma do wymiany publicznych talii.
-* **Tryb Offline-First**: Możliwość nauki i tworzenia treści bez dostępu do sieci dzięki lokalnej bazie Room, z synchronizacją w tle.
+
+- **Generowanie fiszek przez AI**: Automatyczne tworzenie par pytanie/odpowiedź z surowego tekstu z opcją weryfikacji i edycji przed zapisaniem.
+- **Algorytm SM-2**: Personalizacja sesji nauki na podstawie ocen trudności (Nie wiem / Trudne / Łatwe) wystawianych przez użytkownika.
+- **Synchronizacja i Marketplace**: Bezpieczne zarządzanie kontami (JWT), synchronizacja z bazą PostgreSQL oraz platforma do wymiany publicznych talii.
+- **Tryb Offline-First**: Możliwość nauki i tworzenia treści bez dostępu do sieci dzięki lokalnej bazie Room, z synchronizacją w tle.
 
 ## Zespół
-* **Jakub Siłka** – [@jakub7038](https://github.com/jakub7038)
-* **Paweł Powęska** – [@SpeedYoo](https://github.com/SpeedYoo)
-* **Piotr Gorzkiewicz** – [@g0rzki](https://github.com/g0rzki)
-* **Krzysztof Dąbrowski** – [@SooNlK](https://github.com/SooNlK)
+
+- **Jakub Siłka** – [@jakub7038](https://github.com/jakub7038)
+- **Paweł Powęska** – [@SpeedYoo](https://github.com/SpeedYoo)
+- **Piotr Gorzkiewicz** – [@g0rzki](https://github.com/g0rzki)
+- **Krzysztof Dąbrowski** – [@SooNlK](https://github.com/SooNlK)
 
 ## Stos technologiczny
-* **Android:** Kotlin, Jetpack Compose, Room (SQLite)
-* **Backend:** Java + Spring Boot, Docker
-* **Baza danych:** PostgreSQL
-* **CI/CD:** GitHub Actions
-* **Zarządzanie:** Jira, metodyka zwinna (Scrum/Kanban)
+
+- **Android:** Kotlin, Jetpack Compose, Room (SQLite)
+- **Backend:** Java + Spring Boot, Docker
+- **Baza danych:** PostgreSQL
+- **CI/CD:** GitHub Actions
+- **Zarządzanie:** Jira, metodyka zwinna (Scrum/Kanban)
 
 ## Architektura i Moduły
 
 ### Opis Architektury
+
 System opiera się na architekturze klient-serwer z podejściem **offline-first**. Aplikacja mobilna posiada lokalną bazę danych, która synchronizuje się z backendem (REST API) po odzyskaniu połączenia. Całość infrastruktury serwerowej jest skonteneryzowana przy użyciu Docker.
 
 ### Podział na moduły
-* **Moduł Mobilny:** Obsługa interfejsu (Compose), lokalna baza (Room) oraz implementacja algorytmu SM-2.
-* **Moduł AI:** Integracja z zewnętrznymi modelami w celu generowania fiszek z surowego tekstu.
-* **Moduł Synchronizacji:** Zarządzanie spójnością danych między urządzeniem a serwerem.
-* **Moduł Społecznościowy:** Marketplace umożliwiający udostępnianie i pobieranie publicznych talii.
+
+- **Moduł Mobilny:** Obsługa interfejsu (Compose), lokalna baza (Room) oraz implementacja algorytmu SM-2.
+- **Moduł AI:** Integracja z zewnętrznymi modelami w celu generowania fiszek z surowego tekstu.
+- **Moduł Synchronizacji:** Zarządzanie spójnością danych między urządzeniem a serwerem.
+- **Moduł Społecznościowy:** Marketplace umożliwiający udostępnianie i pobieranie publicznych talii.
 
 ## Diagramy
 
 ### Diagram przypadków użycia (SCRUM-10)
+
 ```mermaid
 graph TD
   subgraph Aktorzy
@@ -75,6 +83,7 @@ graph TD
 ```
 
 ### Diagram aktywności – generowanie fiszek AI (SCRUM-11)
+
 ```mermaid
 flowchart TD
   A([Start]) --> B[Użytkownik wkleja tekst]
@@ -101,6 +110,7 @@ flowchart TD
 ```
 
 ### Diagram sekwencji – sesja nauki SM-2 (SCRUM-12)
+
 ```mermaid
 sequenceDiagram
   actor Użytkownik
@@ -128,6 +138,7 @@ sequenceDiagram
 ```
 
 ### Diagram sekwencji – logowanie użytkownika (SCRUM-13)
+
 ```mermaid
 sequenceDiagram
   actor Użytkownik
@@ -152,6 +163,10 @@ sequenceDiagram
     App->>Użytkownik: Przekieruj na Dashboard
   end
 ```
+
+### Diagram związków encji - ERD (SCRUM-18)
+
+![Diagram ERD](./docs/diagrams/erd.png)
 
 ## Uruchomienie lokalne
 
