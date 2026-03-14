@@ -1,0 +1,11 @@
+# Konfiguracja API FlashLearn
+# Skopiuj ten plik jako config.properties i ustaw swoje IP
+
+# Dla emulatora Android:
+# API_BASE_URL=http://10.0.2.2:8080/
+
+# Dla telefonu w tej samej sieci WiFi:
+# Sprawdz swoje IP komputera: ipconfig (Windows) lub ifconfig (Linux/Mac)
+# API_BASE_URL=http://TWOJE_IP:8080/
+
+API_BASE_URL=http://192.168.1.100:8080/

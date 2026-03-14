@@ -7,6 +7,7 @@ build/
 
 # Local configuration
 local.properties
+**/assets/config.properties
 
 # Android Studio
 .idea/
