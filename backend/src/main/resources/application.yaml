@@ -21,3 +21,4 @@ server:
 jwt:
   secret: ${JWT_SECRET:dev_secret_change_in_production}
   expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+  refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000} 
