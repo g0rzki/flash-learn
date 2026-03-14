@@ -1,3 +1,5 @@
+package com.example.flashlearn.data.remote
+
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -6,5 +8,5 @@ interface AuthApiService {
     suspend fun login(@Body request: LoginRequest): LoginResponse
 
     @POST("auth/register")
-    suspend fun register(@Body request: RegisterRequest): Unit
+    suspend fun register(@Body request: RegisterRequest): RegisterResponse
 }

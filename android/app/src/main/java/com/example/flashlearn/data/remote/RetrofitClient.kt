@@ -1,3 +1,6 @@
+package com.example.flashlearn.data.remote
+
+import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -5,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://10.0.2.2:8080/" // localhost dla emulatora
+    private var retrofit: Retrofit? = null
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -15,11 +18,16 @@ object RetrofitClient {
         .addInterceptor(loggingInterceptor)
         .build()
 
-    val instance: Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    fun init(context: Context) {
+        Config.init(context)
+        retrofit = Retrofit.Builder()
+            .baseUrl(Config.getBaseUrl())
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
-    val authApi: AuthApiService = instance.create(AuthApiService::class.java)
+    val authApi: AuthApiService
+        get() = retrofit?.create(AuthApiService::class.java)
+            ?: throw IllegalStateException("RetrofitClient not initialized. Call init(context) first.")
 }
