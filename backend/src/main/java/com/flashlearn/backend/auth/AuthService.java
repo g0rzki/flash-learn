@@ -3,7 +3,9 @@ package com.flashlearn.backend.auth;
 import com.flashlearn.backend.exception.EmailAlreadyExistsException;
 import com.flashlearn.backend.model.User;
 import com.flashlearn.backend.repository.UserRepository;
+import com.flashlearn.backend.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
