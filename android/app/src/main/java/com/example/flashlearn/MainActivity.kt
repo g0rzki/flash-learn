@@ -16,11 +16,12 @@ import com.example.flashlearn.ui.screens.LoginScreen
 import com.example.flashlearn.ui.screens.MainScreen
 import com.example.flashlearn.ui.screens.RegisterScreen
 import com.example.flashlearn.ui.theme.FlashLearnTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        RetrofitClient.init(applicationContext)
         TokenManager.init(applicationContext)
         enableEdgeToEdge()
         setContent {
