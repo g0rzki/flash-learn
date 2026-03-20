@@ -9,6 +9,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Serwis obsługujący autentykację użytkowników.
+ * Realizuje rejestrację i logowanie z JWT.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -17,6 +21,14 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    /**
+     * Rejestruje nowego użytkownika.
+     * Hashuje hasło BCrypt i zapisuje w bazie.
+     *
+     * @param request email i hasło
+     * @return dane zarejestrowanego użytkownika
+     * @throws EmailAlreadyExistsException gdy email jest zajęty
+     */
     public RegisterResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException(request.getEmail());
@@ -32,6 +44,13 @@ public class AuthService {
         return new RegisterResponse(saved.getId(), saved.getEmail(), "User registered successfully");
     }
 
+    /**
+     * Loguje użytkownika i generuje tokeny JWT.
+     *
+     * @param request email i hasło
+     * @return access token + refresh token
+     * @throws BadCredentialsException gdy dane logowania są nieprawidłowe
+     */
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
