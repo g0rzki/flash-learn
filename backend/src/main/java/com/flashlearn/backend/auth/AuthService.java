@@ -105,4 +105,28 @@ public class AuthService {
 
         return new RefreshTokenResponse(newAccessToken, newRefreshToken);
     }
+
+    /**
+     * Wylogowuje użytkownika przez dodanie refresh tokena do blacklisty.
+     * Kolejne próby użycia unieważnionego tokena zwrócą 401.
+     *
+     * @param request refresh token do unieważnienia
+     * @throws InvalidTokenException gdy token jest nieważny lub wygasły
+     */
+    public void logout(LogoutRequest request) {
+        String token = request.getRefreshToken();
+
+        if (!jwtService.isTokenValid(token)) {
+            throw new InvalidTokenException("Token is invalid or expired");
+        }
+
+        if (!revokedTokenRepository.existsByToken(token)) {
+            revokedTokenRepository.save(RevokedToken.builder()
+                    .token(token)
+                    .expiresAt(LocalDateTime.ofInstant(
+                            jwtService.extractExpiration(token).toInstant(),
+                            ZoneId.systemDefault()))
+                    .build());
+        }
+    }
 }

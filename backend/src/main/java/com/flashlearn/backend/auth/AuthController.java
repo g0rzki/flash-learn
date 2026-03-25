@@ -75,4 +75,15 @@ public class AuthController {
     public ResponseEntity<RefreshTokenResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(authService.refresh(request));
     }
+
+    @Operation(summary = "Wylogowanie użytkownika")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Wylogowano, token unieważniony"),
+            @ApiResponse(responseCode = "401", description = "Token nieważny lub wygasły")
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@Valid @RequestBody LogoutRequest request) {
+        authService.logout(request);
+        return ResponseEntity.noContent().build();
+    }
 }
