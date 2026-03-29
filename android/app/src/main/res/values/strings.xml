@@ -1,3 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FlashLearn</string>
+
+    <!-- Shared labels -->
+    <string name="label_email">Email</string>
+    <string name="label_password">Hasło</string>
+    <string name="label_question">Pytanie</string>
+    <string name="label_answer">Odpowiedź</string>
+
+    <!-- Shared content descriptions -->
+    <string name="content_desc_back">Wróć</string>
+    <string name="content_desc_save">Zapisz</string>
+
+    <!-- Shared buttons -->
+    <string name="btn_create_deck">Utwórz talię</string>
+    <string name="btn_add_flashcard">Dodaj fiszkę</string>
+    <string name="btn_save_changes">Zapisz zmiany</string>
+    <string name="btn_delete">Usuń</string>
+    <string name="btn_cancel">Anuluj</string>
+
+    <!-- Shared format strings -->
+    <string name="flashcards_count">Fiszki: %1$d</string>
+    <string name="last_updated">Ostatnia aktualizacja: %1$s</string>
+    <string name="error_field_max_chars">Maksymalnie %1$d znaków</string>
+
+    <!-- Auth validation errors -->
+    <string name="error_email_required">Email jest wymagany</string>
+    <string name="error_email_invalid">Nieprawidłowy format email</string>
+    <string name="error_password_required">Hasło jest wymagane</string>
+    <string name="error_password_min_length">Hasło musi mieć minimum 8 znaków</string>
+    <string name="error_confirm_password_required">Powtórz hasło</string>
+    <string name="error_passwords_mismatch">Hasła nie są takie same</string>
+
+    <!-- Auth API errors (RegisterScreen inline) -->
+    <string name="error_email_taken">Ten adres email jest już zajęty</string>
+    <string name="error_invalid_data">Nieprawidłowe dane</string>
+    <string name="error_server_code">Błąd serwera: %1$d</string>
+    <string name="error_connection">Błąd połączenia z serwerem</string>
+
+    <!-- AuthViewModel errors -->
+    <string name="error_no_internet">Brak połączenia z internetem. Sprawdź swoje połączenie.</string>
+    <string name="error_timeout">Przekroczono czas oczekiwania na odpowiedź serwera.</string>
+    <string name="error_invalid_credentials">Nieprawidłowy e-mail lub hasło.</string>
+    <string name="error_email_already_exists">Użytkownik o takim adresie e-mail już istnieje.</string>
+    <string name="error_server">Błąd serwera. Spróbuj ponownie później.</string>
+    <string name="error_network_code">Wystąpił błąd sieciowy (%1$d).</string>
+    <string name="error_unknown">Wystąpił nieznany błąd.</string>
+
+    <!-- LoginScreen -->
+    <string name="login_title">Logowanie</string>
+    <string name="btn_login">Zaloguj się</string>
+    <string name="login_no_account">Nie masz konta? Zarejestruj się</string>
+
+    <!-- RegisterScreen -->
+    <string name="register_title">Rejestracja</string>
+    <string name="label_confirm_password">Powtórz hasło</string>
+    <string name="btn_register">Zarejestruj się</string>
+    <string name="register_have_account">Masz już konto? Zaloguj się</string>
+
+    <!-- DashboardScreen -->
+    <string name="profile_title">Twój profil</string>
+    <string name="label_email_address">Adres e-mail</string>
+    <string name="label_registered_at">Data rejestracji</string>
+    <string name="btn_logout">Wyloguj się</string>
+
+    <!-- DeckListScreen -->
+    <string name="content_desc_new_deck">Nowa talia</string>
+    <string name="my_decks_title">Moje talie</string>
+    <string name="content_desc_delete_deck">Usuń talię</string>
+    <string name="empty_decks_title">Brak talii</string>
+    <string name="empty_decks_message">Stwórz swoją pierwszą talię fiszek\ni zacznij naukę już dziś!</string>
+
+    <!-- CreateScreen -->
+    <string name="error_deck_required">Wybierz talię</string>
+    <string name="error_question_required">Pytanie jest wymagane</string>
+    <string name="error_answer_required">Odpowiedź jest wymagana</string>
+    <string name="create_flashcard_title">Dodaj fiszkę</string>
+    <string name="label_deck">Talia</string>
+    <string name="flashcard_added">Fiszka dodana!</string>
+    <string name="no_decks_title">Brak talii</string>
+    <string name="no_decks_create_first">Najpierw utwórz talię w zakładce \"Moje talie\", aby móc dodawać fiszki.</string>
+
+    <!-- DeckEditScreen -->
+    <string name="error_title_required">Nazwa jest wymagana</string>
+    <string name="error_title_min_length">Nazwa musi mieć co najmniej %1$d znaki</string>
+    <string name="error_title_max_length">Nazwa może mieć maksymalnie %1$d znaków</string>
+    <string name="deck_edit_title">Edytuj talię</string>
+    <string name="deck_new_title">Nowa talia</string>
+    <string name="label_deck_name">Nazwa talii</string>
+    <string name="label_description_optional">Opis (opcjonalny)</string>
+
+    <!-- FlashcardListScreen -->
+    <string name="dialog_delete_flashcard_title">Usuń fiszkę</string>
+    <string name="dialog_delete_flashcard_message">Czy na pewno chcesz usunąć tę fiszkę? Tej operacji nie można cofnąć.</string>
+    <string name="content_desc_delete_flashcard">Usuń fiszkę</string>
+    <string name="empty_flashcards_title">Brak fiszek</string>
+    <string name="empty_flashcards_message">Dodaj pierwszą fiszkę do tej talii</string>
+
+    <!-- FlashcardEditScreen -->
+    <string name="error_question_max">Pytanie może mieć maksymalnie %1$d znaków</string>
+    <string name="error_answer_max">Odpowiedź może mieć maksymalnie %1$d znaków</string>
+    <string name="flashcard_edit_title">Edytuj fiszkę</string>
+    <string name="flashcard_new_title">Nowa fiszka</string>
+    <string name="btn_create_flashcard">Utwórz fiszkę</string>
+
+    <!-- LearnScreen -->
+    <string name="learn_title">Nauka</string>
+    <string name="learn_subtitle">Tutaj rozpoczniesz sesję nauki z algorytmem SM-2</string>
+
+    <!-- MarketplaceScreen -->
+    <string name="marketplace_title">Marketplace</string>
+    <string name="marketplace_subtitle">Przeglądaj i pobieraj publiczne talie</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_learn">Nauka</string>
+    <string name="nav_my_decks">Moje talie</string>
+    <string name="nav_create">Dodaj</string>
+    <string name="nav_explore">Przeglądaj</string>
+    <string name="nav_profile">Profil</string>
 </resources>

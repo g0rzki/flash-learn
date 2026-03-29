@@ -12,10 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import com.example.flashlearn.R
 import com.flashlearn.data.db.AppDatabase
 import com.flashlearn.data.entity.Flashcard
 import kotlinx.coroutines.launch
@@ -45,8 +47,8 @@ fun FlashcardListScreen(
     if (flashcardToDelete != null) {
         AlertDialog(
             onDismissRequest = { flashcardToDelete = null },
-            title = { Text("Usuń fiszkę") },
-            text = { Text("Czy na pewno chcesz usunąć tę fiszkę? Tej operacji nie można cofnąć.") },
+            title = { Text(stringResource(R.string.dialog_delete_flashcard_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_flashcard_message)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -55,12 +57,12 @@ fun FlashcardListScreen(
                         scope.launch { flashcardDao.delete(target) }
                     }
                 ) {
-                    Text("Usuń", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.btn_delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { flashcardToDelete = null }) {
-                    Text("Anuluj")
+                    Text(stringResource(R.string.btn_cancel))
                 }
             }
         )
@@ -74,7 +76,7 @@ fun FlashcardListScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Wróć"
+                            contentDescription = stringResource(R.string.content_desc_back)
                         )
                     }
                 },
@@ -90,7 +92,7 @@ fun FlashcardListScreen(
                 onClick = onNavigateToCreateFlashcard,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Dodaj fiszkę")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.btn_add_flashcard))
             }
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -114,7 +116,7 @@ fun FlashcardListScreen(
             ) {
                 item {
                     Text(
-                        text = "Fiszki: ${flashcards.size}",
+                        text = stringResource(R.string.flashcards_count, flashcards.size),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 4.dp)
@@ -171,7 +173,7 @@ private fun FlashcardItem(
             IconButton(onClick = onDeleteClick) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Usuń fiszkę",
+                    contentDescription = stringResource(R.string.content_desc_delete_flashcard),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -187,12 +189,12 @@ private fun EmptyFlashcardsState(onAddClick: () -> Unit) {
         modifier = Modifier.padding(32.dp)
     ) {
         Text(
-            text = "Brak fiszek",
+            text = stringResource(R.string.empty_flashcards_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "Dodaj pierwszą fiszkę do tej talii",
+            text = stringResource(R.string.empty_flashcards_message),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -200,7 +202,7 @@ private fun EmptyFlashcardsState(onAddClick: () -> Unit) {
             onClick = onAddClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Dodaj fiszkę")
+            Text(stringResource(R.string.btn_add_flashcard))
         }
     }
 }

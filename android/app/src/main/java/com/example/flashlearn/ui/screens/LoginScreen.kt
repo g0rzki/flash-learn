@@ -6,11 +6,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.flashlearn.R
 import com.example.flashlearn.ui.auth.AuthUiState
 import com.example.flashlearn.ui.auth.AuthViewModel
 
@@ -27,6 +29,10 @@ fun LoginScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val errEmailRequired = stringResource(R.string.error_email_required)
+    val errEmailInvalid = stringResource(R.string.error_email_invalid)
+    val errPasswordRequired = stringResource(R.string.error_password_required)
+
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
             viewModel.resetState()
@@ -36,8 +42,8 @@ fun LoginScreen(
 
     fun validateEmail(): Boolean {
         emailError = when {
-            email.isBlank() -> "Email jest wymagany"
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Nieprawidłowy format email"
+            email.isBlank() -> errEmailRequired
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> errEmailInvalid
             else -> null
         }
         return emailError == null
@@ -45,7 +51,7 @@ fun LoginScreen(
 
     fun validatePassword(): Boolean {
         passwordError = when {
-            password.isBlank() -> "Hasło jest wymagane"
+            password.isBlank() -> errPasswordRequired
             else -> null
         }
         return passwordError == null
@@ -71,7 +77,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Logowanie",
+                text = stringResource(R.string.login_title),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
@@ -82,7 +88,7 @@ fun LoginScreen(
                     email = it
                     if (emailError != null) validateEmail()
                 },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.label_email)) },
                 isError = emailError != null,
                 supportingText = emailError?.let { { Text(it) } },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -98,7 +104,7 @@ fun LoginScreen(
                     password = it
                     if (passwordError != null) validatePassword()
                 },
-                label = { Text("Hasło") },
+                label = { Text(stringResource(R.string.label_password)) },
                 isError = passwordError != null,
                 supportingText = passwordError?.let { { Text(it) } },
                 visualTransformation = PasswordVisualTransformation(),
@@ -129,14 +135,14 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Zaloguj się")
+                    Text(stringResource(R.string.btn_login))
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(onClick = onNavigateToRegister) {
-                Text("Nie masz konta? Zarejestruj się")
+                Text(stringResource(R.string.login_no_account))
             }
         }
     }

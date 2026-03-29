@@ -6,9 +6,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.flashlearn.R
 import com.example.flashlearn.data.remote.RegisterRequest
 import com.example.flashlearn.data.remote.RetrofitClient
 import kotlinx.coroutines.launch
@@ -32,10 +34,21 @@ fun RegisterScreen(
 
     val scope = rememberCoroutineScope()
 
+    val errEmailRequired = stringResource(R.string.error_email_required)
+    val errEmailInvalid = stringResource(R.string.error_email_invalid)
+    val errPasswordRequired = stringResource(R.string.error_password_required)
+    val errPasswordMinLength = stringResource(R.string.error_password_min_length)
+    val errConfirmPasswordRequired = stringResource(R.string.error_confirm_password_required)
+    val errPasswordsMismatch = stringResource(R.string.error_passwords_mismatch)
+    val errEmailTaken = stringResource(R.string.error_email_taken)
+    val errInvalidData = stringResource(R.string.error_invalid_data)
+    val errServerCodeFmt = stringResource(R.string.error_server_code)
+    val errConnection = stringResource(R.string.error_connection)
+
     fun validateEmail(): Boolean {
         emailError = when {
-            email.isBlank() -> "Email jest wymagany"
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Nieprawidłowy format email"
+            email.isBlank() -> errEmailRequired
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> errEmailInvalid
             else -> null
         }
         return emailError == null
@@ -43,8 +56,8 @@ fun RegisterScreen(
 
     fun validatePassword(): Boolean {
         passwordError = when {
-            password.isBlank() -> "Hasło jest wymagane"
-            password.length < 8 -> "Hasło musi mieć minimum 8 znaków"
+            password.isBlank() -> errPasswordRequired
+            password.length < 8 -> errPasswordMinLength
             else -> null
         }
         return passwordError == null
@@ -52,8 +65,8 @@ fun RegisterScreen(
 
     fun validateConfirmPassword(): Boolean {
         confirmPasswordError = when {
-            confirmPassword.isBlank() -> "Powtórz hasło"
-            confirmPassword != password -> "Hasła nie są takie same"
+            confirmPassword.isBlank() -> errConfirmPasswordRequired
+            confirmPassword != password -> errPasswordsMismatch
             else -> null
         }
         return confirmPasswordError == null
@@ -75,13 +88,13 @@ fun RegisterScreen(
                 } catch (e: HttpException) {
                     isLoading = false
                     apiError = when (e.code()) {
-                        409 -> "Ten adres email jest już zajęty"
-                        400 -> "Nieprawidłowe dane"
-                        else -> "Błąd serwera: ${e.code()}"
+                        409 -> errEmailTaken
+                        400 -> errInvalidData
+                        else -> String.format(errServerCodeFmt, e.code())
                     }
                 } catch (e: Exception) {
                     isLoading = false
-                    apiError = "Błąd połączenia z serwerem"
+                    apiError = errConnection
                 }
             }
         }
@@ -99,7 +112,7 @@ fun RegisterScreen(
             verticalArrangement = Arrangement.Center
         ) {
         Text(
-            text = "Rejestracja",
+            text = stringResource(R.string.register_title),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -110,7 +123,7 @@ fun RegisterScreen(
                 email = it
                 if (emailError != null) validateEmail()
             },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.label_email)) },
             isError = emailError != null,
             supportingText = emailError?.let { { Text(it) } },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -126,7 +139,7 @@ fun RegisterScreen(
                 password = it
                 if (passwordError != null) validatePassword()
             },
-            label = { Text("Hasło") },
+            label = { Text(stringResource(R.string.label_password)) },
             isError = passwordError != null,
             supportingText = passwordError?.let { { Text(it) } },
             visualTransformation = PasswordVisualTransformation(),
@@ -143,7 +156,7 @@ fun RegisterScreen(
                 confirmPassword = it
                 if (confirmPasswordError != null) validateConfirmPassword()
             },
-            label = { Text("Powtórz hasło") },
+            label = { Text(stringResource(R.string.label_confirm_password)) },
             isError = confirmPasswordError != null,
             supportingText = confirmPasswordError?.let { { Text(it) } },
             visualTransformation = PasswordVisualTransformation(),
@@ -174,14 +187,14 @@ fun RegisterScreen(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Zarejestruj się")
+                Text(stringResource(R.string.btn_register))
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = onNavigateToLogin) {
-            Text("Masz już konto? Zaloguj się")
+            Text(stringResource(R.string.register_have_account))
         }
         }
     }

@@ -12,10 +12,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.flashlearn.R
 import com.example.flashlearn.ui.decklist.DeckListViewModel
 import com.flashlearn.data.dao.DeckWithCount
 import com.flashlearn.data.db.AppDatabase
@@ -45,6 +47,12 @@ fun CreateScreen(
     var deckError by remember { mutableStateOf<String?>(null) }
     var isSaving by remember { mutableStateOf(false) }
 
+    val errDeckRequired = stringResource(R.string.error_deck_required)
+    val errQuestionRequired = stringResource(R.string.error_question_required)
+    val errAnswerRequired = stringResource(R.string.error_answer_required)
+    val errFieldMaxChars = stringResource(R.string.error_field_max_chars)
+    val msgFlashcardAdded = stringResource(R.string.flashcard_added)
+
     LaunchedEffect(decks) {
         if (selectedDeck == null && decks.isNotEmpty()) {
             selectedDeck = decks.first()
@@ -52,15 +60,15 @@ fun CreateScreen(
     }
 
     fun validateAndSave() {
-        deckError = if (selectedDeck == null) "Wybierz talię" else null
+        deckError = if (selectedDeck == null) errDeckRequired else null
         questionError = when {
-            question.isBlank() -> "Pytanie jest wymagane"
-            question.length > FIELD_MAX -> "Maksymalnie $FIELD_MAX znaków"
+            question.isBlank() -> errQuestionRequired
+            question.length > FIELD_MAX -> String.format(errFieldMaxChars, FIELD_MAX)
             else -> null
         }
         answerError = when {
-            answer.isBlank() -> "Odpowiedź jest wymagana"
-            answer.length > FIELD_MAX -> "Maksymalnie $FIELD_MAX znaków"
+            answer.isBlank() -> errAnswerRequired
+            answer.length > FIELD_MAX -> String.format(errFieldMaxChars, FIELD_MAX)
             else -> null
         }
         if (deckError != null || questionError != null || answerError != null) return
@@ -82,7 +90,7 @@ fun CreateScreen(
             questionError = null
             answerError = null
             isSaving = false
-            snackbarHostState.showSnackbar("Fiszka dodana!")
+            snackbarHostState.showSnackbar(msgFlashcardAdded)
         }
     }
 
@@ -111,7 +119,7 @@ fun CreateScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Dodaj fiszkę",
+                    text = stringResource(R.string.create_flashcard_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -125,7 +133,7 @@ fun CreateScreen(
                         value = selectedDeck?.title ?: "",
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Talia") },
+                        label = { Text(stringResource(R.string.label_deck)) },
                         trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
@@ -151,7 +159,7 @@ fun CreateScreen(
                                             style = MaterialTheme.typography.bodyLarge
                                         )
                                         Text(
-                                            text = "Fiszki: ${deck.flashcardCount}",
+                                            text = stringResource(R.string.flashcards_count, deck.flashcardCount),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -174,7 +182,7 @@ fun CreateScreen(
                         if (it.length <= FIELD_MAX) question = it
                         if (questionError != null && it.isNotBlank()) questionError = null
                     },
-                    label = { Text("Pytanie") },
+                    label = { Text(stringResource(R.string.label_question)) },
                     isError = questionError != null,
                     supportingText = {
                         Row(
@@ -204,7 +212,7 @@ fun CreateScreen(
                         if (it.length <= FIELD_MAX) answer = it
                         if (answerError != null && it.isNotBlank()) answerError = null
                     },
-                    label = { Text("Odpowiedź") },
+                    label = { Text(stringResource(R.string.label_answer)) },
                     isError = answerError != null,
                     supportingText = {
                         Row(
@@ -239,7 +247,7 @@ fun CreateScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Dodaj fiszkę")
+                        Text(stringResource(R.string.btn_add_flashcard))
                     }
                 }
 
@@ -263,12 +271,12 @@ private fun NoDecksPrompt() {
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
         )
         Text(
-            text = "Brak talii",
+            text = stringResource(R.string.no_decks_title),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "Najpierw utwórz talię w zakładce \"Moje talie\", aby móc dodawać fiszki.",
+            text = stringResource(R.string.no_decks_create_first),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center

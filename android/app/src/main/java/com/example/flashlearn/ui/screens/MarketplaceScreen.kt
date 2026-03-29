@@ -5,7 +5,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.flashlearn.R
 
 @Composable
 fun MarketplaceScreen() {
@@ -17,12 +19,12 @@ fun MarketplaceScreen() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Marketplace",
+            text = stringResource(R.string.marketplace_title),
             style = MaterialTheme.typography.headlineMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Przeglądaj i pobieraj publiczne talie",
+            text = stringResource(R.string.marketplace_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
