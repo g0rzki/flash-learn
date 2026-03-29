@@ -237,3 +237,13 @@ API_BASE_URL=http://TWOJE_IP:8080/
 4. Uruchom aplikację (Shift+F10)
 
 ## Dokumentacja API
+
+### Swagger UI
+
+Interaktywna dokumentacja API dostępna po uruchomieniu backendu:
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+
