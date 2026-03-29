@@ -13,11 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.flashlearn.R
 import com.example.flashlearn.ui.profile.LogoutState
 import com.example.flashlearn.ui.profile.ProfileViewModel
 
@@ -67,7 +69,7 @@ fun DashboardScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Twój profil",
+            text = stringResource(R.string.profile_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
@@ -87,7 +89,7 @@ fun DashboardScreen(
             Column(modifier = Modifier.padding(20.dp)) {
                 ProfileInfoRow(
                     icon = { Icon(Icons.Default.Email, contentDescription = null) },
-                    label = "Adres e-mail",
+                    label = stringResource(R.string.label_email_address),
                     value = email
                 )
                 HorizontalDivider(
@@ -96,7 +98,7 @@ fun DashboardScreen(
                 )
                 ProfileInfoRow(
                     icon = { Icon(Icons.Default.DateRange, contentDescription = null) },
-                    label = "Data rejestracji",
+                    label = stringResource(R.string.label_registered_at),
                     value = registeredAt
                 )
             }
@@ -131,7 +133,7 @@ fun DashboardScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Wyloguj się",
+                    text = stringResource(R.string.btn_logout),
                     style = MaterialTheme.typography.labelLarge
                 )
             }
@@ -180,4 +182,3 @@ private fun ProfileInfoRow(
         }
     }
 }
-

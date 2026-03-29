@@ -1,7 +1,9 @@
 package com.example.flashlearn.ui.auth
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.flashlearn.R
 import com.example.flashlearn.domain.repository.AuthRepository
 import com.example.flashlearn.domain.usecase.LoginUseCase
 import com.example.flashlearn.domain.usecase.RegisterUseCase
@@ -14,10 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+    application: Application,
     private val loginUseCase: LoginUseCase,
     private val registerUseCase: RegisterUseCase,
     private val repository: AuthRepository
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
@@ -64,20 +67,21 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun handleAuthError(error: Throwable): String {
+        val app = getApplication<Application>()
         return when (error) {
             is java.io.IOException ->
-                "Brak połączenia z internetem. Sprawdź swoje połączenie."
+                app.getString(R.string.error_no_internet)
             is java.util.concurrent.TimeoutException,
             is kotlinx.coroutines.TimeoutCancellationException ->
-                "Przekroczono czas oczekiwania na odpowiedź serwera."
+                app.getString(R.string.error_timeout)
             is retrofit2.HttpException -> when (error.code()) {
-                401 -> "Nieprawidłowy e-mail lub hasło."
-                403 -> "Nieprawidłowy e-mail lub hasło."
-                409 -> "Użytkownik o takim adresie e-mail już istnieje."
-                in 500..599 -> "Błąd serwera. Spróbuj ponownie później."
-                else -> "Wystąpił błąd sieciowy (${error.code()})."
+                401 -> app.getString(R.string.error_invalid_credentials)
+                403 -> app.getString(R.string.error_invalid_credentials)
+                409 -> app.getString(R.string.error_email_already_exists)
+                in 500..599 -> app.getString(R.string.error_server)
+                else -> app.getString(R.string.error_network_code, error.code())
             }
-            else -> error.message ?: "Wystąpił nieznany błąd."
+            else -> error.message ?: app.getString(R.string.error_unknown)
         }
     }
 }

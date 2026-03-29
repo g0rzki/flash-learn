@@ -11,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.flashlearn.R
 import com.flashlearn.data.db.AppDatabase
 import com.flashlearn.data.entity.Flashcard
 import kotlinx.coroutines.launch
@@ -40,6 +42,11 @@ fun FlashcardEditScreen(
     var isLoading by remember { mutableStateOf(isEditMode) }
     var isSaving by remember { mutableStateOf(false) }
 
+    val errQuestionRequired = stringResource(R.string.error_question_required)
+    val errQuestionMax = stringResource(R.string.error_question_max)
+    val errAnswerRequired = stringResource(R.string.error_answer_required)
+    val errAnswerMax = stringResource(R.string.error_answer_max)
+
     LaunchedEffect(flashcardId) {
         if (flashcardId != null) {
             val flashcard = dao.getById(flashcardId)
@@ -54,8 +61,8 @@ fun FlashcardEditScreen(
 
     fun validateQuestion(): Boolean {
         questionError = when {
-            question.isBlank() -> "Pytanie jest wymagane"
-            question.length > FIELD_MAX -> "Pytanie może mieć maksymalnie $FIELD_MAX znaków"
+            question.isBlank() -> errQuestionRequired
+            question.length > FIELD_MAX -> String.format(errQuestionMax, FIELD_MAX)
             else -> null
         }
         return questionError == null
@@ -63,8 +70,8 @@ fun FlashcardEditScreen(
 
     fun validateAnswer(): Boolean {
         answerError = when {
-            answer.isBlank() -> "Odpowiedź jest wymagana"
-            answer.length > FIELD_MAX -> "Odpowiedź może mieć maksymalnie $FIELD_MAX znaków"
+            answer.isBlank() -> errAnswerRequired
+            answer.length > FIELD_MAX -> String.format(errAnswerMax, FIELD_MAX)
             else -> null
         }
         return answerError == null
@@ -109,13 +116,13 @@ fun FlashcardEditScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(if (isEditMode) "Edytuj fiszkę" else "Nowa fiszka")
+                    Text(stringResource(if (isEditMode) R.string.flashcard_edit_title else R.string.flashcard_new_title))
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Wróć"
+                            contentDescription = stringResource(R.string.content_desc_back)
                         )
                     }
                 },
@@ -126,7 +133,7 @@ fun FlashcardEditScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Zapisz"
+                            contentDescription = stringResource(R.string.content_desc_save)
                         )
                     }
                 },
@@ -164,7 +171,7 @@ fun FlashcardEditScreen(
                         if (it.length <= FIELD_MAX) question = it
                         if (questionError != null) validateQuestion()
                     },
-                    label = { Text("Pytanie") },
+                    label = { Text(stringResource(R.string.label_question)) },
                     isError = questionError != null,
                     supportingText = {
                         Row(
@@ -193,7 +200,7 @@ fun FlashcardEditScreen(
                         if (it.length <= FIELD_MAX) answer = it
                         if (answerError != null) validateAnswer()
                     },
-                    label = { Text("Odpowiedź") },
+                    label = { Text(stringResource(R.string.label_answer)) },
                     isError = answerError != null,
                     supportingText = {
                         Row(
@@ -228,7 +235,7 @@ fun FlashcardEditScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text(if (isEditMode) "Zapisz zmiany" else "Utwórz fiszkę")
+                        Text(stringResource(if (isEditMode) R.string.btn_save_changes else R.string.btn_create_flashcard))
                     }
                 }
             }

@@ -11,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.flashlearn.R
 import com.flashlearn.data.db.AppDatabase
 import com.flashlearn.data.entity.Deck
 import kotlinx.coroutines.launch
@@ -39,6 +41,10 @@ fun DeckEditScreen(
     var isLoading by remember { mutableStateOf(isEditMode) }
     var isSaving by remember { mutableStateOf(false) }
 
+    val errTitleRequired = stringResource(R.string.error_title_required)
+    val errTitleMinLength = stringResource(R.string.error_title_min_length)
+    val errTitleMaxLength = stringResource(R.string.error_title_max_length)
+
     LaunchedEffect(deckId) {
         if (deckId != null) {
             val deck = dao.getById(deckId)
@@ -52,9 +58,9 @@ fun DeckEditScreen(
 
     fun validateTitle(): Boolean {
         titleError = when {
-            title.isBlank() -> "Nazwa jest wymagana"
-            title.trim().length < TITLE_MIN -> "Nazwa musi mieć co najmniej $TITLE_MIN znaki"
-            title.length > TITLE_MAX -> "Nazwa może mieć maksymalnie $TITLE_MAX znaków"
+            title.isBlank() -> errTitleRequired
+            title.trim().length < TITLE_MIN -> String.format(errTitleMinLength, TITLE_MIN)
+            title.length > TITLE_MAX -> String.format(errTitleMaxLength, TITLE_MAX)
             else -> null
         }
         return titleError == null
@@ -96,13 +102,13 @@ fun DeckEditScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(if (isEditMode) "Edytuj talię" else "Nowa talia")
+                    Text(stringResource(if (isEditMode) R.string.deck_edit_title else R.string.deck_new_title))
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Wróć"
+                            contentDescription = stringResource(R.string.content_desc_back)
                         )
                     }
                 },
@@ -113,7 +119,7 @@ fun DeckEditScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Zapisz"
+                            contentDescription = stringResource(R.string.content_desc_save)
                         )
                     }
                 },
@@ -151,7 +157,7 @@ fun DeckEditScreen(
                         if (it.length <= TITLE_MAX) title = it
                         if (titleError != null) validateTitle()
                     },
-                    label = { Text("Nazwa talii") },
+                    label = { Text(stringResource(R.string.label_deck_name)) },
                     isError = titleError != null,
                     supportingText = {
                         Row(
@@ -178,7 +184,7 @@ fun DeckEditScreen(
                     onValueChange = {
                         if (it.length <= DESC_MAX) description = it
                     },
-                    label = { Text("Opis (opcjonalny)") },
+                    label = { Text(stringResource(R.string.label_description_optional)) },
                     supportingText = {
                         Text(
                             text = "${description.length}/$DESC_MAX",
@@ -203,7 +209,7 @@ fun DeckEditScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text(if (isEditMode) "Zapisz zmiany" else "Utwórz talię")
+                        Text(stringResource(if (isEditMode) R.string.btn_save_changes else R.string.btn_create_deck))
                     }
                 }
             }

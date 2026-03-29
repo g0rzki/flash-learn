@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FlashLearn</string>
+
+    <!-- Shared labels -->
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_question">Question</string>
+    <string name="label_answer">Answer</string>
+
+    <!-- Shared content descriptions -->
+    <string name="content_desc_back">Back</string>
+    <string name="content_desc_save">Save</string>
+
+    <!-- Shared buttons -->
+    <string name="btn_create_deck">Create deck</string>
+    <string name="btn_add_flashcard">Add flashcard</string>
+    <string name="btn_save_changes">Save changes</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- Shared format strings -->
+    <string name="flashcards_count">Flashcards: %1$d</string>
+    <string name="last_updated">Last updated: %1$s</string>
+    <string name="error_field_max_chars">Maximum %1$d characters</string>
+
+    <!-- Auth validation errors -->
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Invalid email format</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_min_length">Password must be at least 8 characters</string>
+    <string name="error_confirm_password_required">Please confirm your password</string>
+    <string name="error_passwords_mismatch">Passwords do not match</string>
+
+    <!-- Auth API errors (RegisterScreen inline) -->
+    <string name="error_email_taken">This email address is already taken</string>
+    <string name="error_invalid_data">Invalid data</string>
+    <string name="error_server_code">Server error: %1$d</string>
+    <string name="error_connection">Connection error</string>
+
+    <!-- AuthViewModel errors -->
+    <string name="error_no_internet">No internet connection. Check your connection.</string>
+    <string name="error_timeout">Server response timed out.</string>
+    <string name="error_invalid_credentials">Invalid email or password.</string>
+    <string name="error_email_already_exists">A user with this email already exists.</string>
+    <string name="error_server">Server error. Please try again later.</string>
+    <string name="error_network_code">A network error occurred (%1$d).</string>
+    <string name="error_unknown">An unknown error occurred.</string>
+
+    <!-- LoginScreen -->
+    <string name="login_title">Sign In</string>
+    <string name="btn_login">Log in</string>
+    <string name="login_no_account">Don\'t have an account? Register</string>
+
+    <!-- RegisterScreen -->
+    <string name="register_title">Registration</string>
+    <string name="label_confirm_password">Confirm password</string>
+    <string name="btn_register">Register</string>
+    <string name="register_have_account">Already have an account? Log in</string>
+
+    <!-- DashboardScreen -->
+    <string name="profile_title">Your profile</string>
+    <string name="label_email_address">Email address</string>
+    <string name="label_registered_at">Registration date</string>
+    <string name="btn_logout">Log out</string>
+
+    <!-- DeckListScreen -->
+    <string name="content_desc_new_deck">New deck</string>
+    <string name="my_decks_title">My decks</string>
+    <string name="content_desc_delete_deck">Delete deck</string>
+    <string name="empty_decks_title">No decks</string>
+    <string name="empty_decks_message">Create your first flashcard deck\nand start learning today!</string>
+
+    <!-- CreateScreen -->
+    <string name="error_deck_required">Please select a deck</string>
+    <string name="error_question_required">Question is required</string>
+    <string name="error_answer_required">Answer is required</string>
+    <string name="create_flashcard_title">Add flashcard</string>
+    <string name="label_deck">Deck</string>
+    <string name="flashcard_added">Flashcard added!</string>
+    <string name="no_decks_title">No decks</string>
+    <string name="no_decks_create_first">First create a deck in the \"My decks\" tab to start adding flashcards.</string>
+
+    <!-- DeckEditScreen -->
+    <string name="error_title_required">Name is required</string>
+    <string name="error_title_min_length">Name must be at least %1$d characters</string>
+    <string name="error_title_max_length">Name can have at most %1$d characters</string>
+    <string name="deck_edit_title">Edit deck</string>
+    <string name="deck_new_title">New deck</string>
+    <string name="label_deck_name">Deck name</string>
+    <string name="label_description_optional">Description (optional)</string>
+
+    <!-- FlashcardListScreen -->
+    <string name="dialog_delete_flashcard_title">Delete flashcard</string>
+    <string name="dialog_delete_flashcard_message">Are you sure you want to delete this flashcard? This action cannot be undone.</string>
+    <string name="content_desc_delete_flashcard">Delete flashcard</string>
+    <string name="empty_flashcards_title">No flashcards</string>
+    <string name="empty_flashcards_message">Add the first flashcard to this deck</string>
+
+    <!-- FlashcardEditScreen -->
+    <string name="error_question_max">Question can have at most %1$d characters</string>
+    <string name="error_answer_max">Answer can have at most %1$d characters</string>
+    <string name="flashcard_edit_title">Edit flashcard</string>
+    <string name="flashcard_new_title">New flashcard</string>
+    <string name="btn_create_flashcard">Create flashcard</string>
+
+    <!-- LearnScreen -->
+    <string name="learn_title">Learn</string>
+    <string name="learn_subtitle">Here you\'ll start a learning session with the SM-2 algorithm</string>
+
+    <!-- MarketplaceScreen -->
+    <string name="marketplace_title">Marketplace</string>
+    <string name="marketplace_subtitle">Browse and download public decks</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_learn">Learn</string>
+    <string name="nav_my_decks">My decks</string>
+    <string name="nav_create">Add</string>
+    <string name="nav_explore">Explore</string>
+    <string name="nav_profile">Profile</string>
+</resources>

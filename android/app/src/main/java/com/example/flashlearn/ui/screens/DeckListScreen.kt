@@ -17,11 +17,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
+import com.example.flashlearn.R
 import com.example.flashlearn.ui.decklist.DeckListViewModel
 import com.flashlearn.data.dao.DeckWithCount
 import java.text.SimpleDateFormat
@@ -41,7 +43,7 @@ fun DeckListScreen(
                 onClick = onNavigateToCreateDeck,
                 containerColor = MaterialTheme.colorScheme.primary,
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Nowa talia")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.content_desc_new_deck))
             }
         }
     ) { paddingValues ->
@@ -72,7 +74,7 @@ fun DeckListScreen(
                 ) {
                     item {
                         Text(
-                            text = "Moje talie",
+                            text = stringResource(R.string.my_decks_title),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(bottom = 4.dp)
@@ -90,6 +92,7 @@ fun DeckListScreen(
         }
     }
 }
+
 @Composable
 fun DeckCard(deck: DeckWithCount, onClick: () -> Unit = {}, onDelete: () -> Unit) {
     val dateFormatter = remember { SimpleDateFormat("dd MMM yyyy", Locale.getDefault()) }
@@ -143,8 +146,8 @@ fun DeckCard(deck: DeckWithCount, onClick: () -> Unit = {}, onDelete: () -> Unit
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    DeckInfoChip(text = "Fiszki: ${deck.flashcardCount}")
-                    DeckInfoChip(text = "Ostatnia aktualizacja: $lastModified")
+                    DeckInfoChip(text = stringResource(R.string.flashcards_count, deck.flashcardCount))
+                    DeckInfoChip(text = stringResource(R.string.last_updated, lastModified))
                 }
                 deck.description?.let { desc ->
                     if (desc.isNotBlank()) {
@@ -164,7 +167,7 @@ fun DeckCard(deck: DeckWithCount, onClick: () -> Unit = {}, onDelete: () -> Unit
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Usuń talię",
+                    contentDescription = stringResource(R.string.content_desc_delete_deck),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -202,12 +205,12 @@ private fun EmptyDecksState(onCreateClick: () -> Unit) {
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
         )
         Text(
-            text = "Brak talii",
+            text = stringResource(R.string.empty_decks_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = "Stwórz swoją pierwszą talię fiszek\ni zacznij naukę już dziś!",
+            text = stringResource(R.string.empty_decks_message),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -216,8 +219,7 @@ private fun EmptyDecksState(onCreateClick: () -> Unit) {
             onClick = onCreateClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Utwórz talię")
+            Text(stringResource(R.string.btn_create_deck))
         }
     }
 }
-
