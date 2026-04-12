@@ -14,6 +14,8 @@ public class SyncDeckDTO {
 
     private Long id; // null jeśli nowa talia
 
+    private Long localId; // id używane lokalnie w aplikacji do mapowania
+
     @NotBlank(message = "Title is required")
     private String title;
 

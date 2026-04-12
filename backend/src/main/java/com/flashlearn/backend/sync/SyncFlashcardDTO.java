@@ -13,6 +13,10 @@ public class SyncFlashcardDTO {
 
     private Long id; // null jeśli nowa fiszka
 
+    private Long localId; // id używane lokalnie w aplikacji
+
+    private Long deckId; // id talii nadrzędnej (z serwera)
+
     @NotBlank(message = "Question is required")
     private String question;
 
