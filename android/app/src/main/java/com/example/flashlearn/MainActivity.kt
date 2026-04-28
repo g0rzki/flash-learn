@@ -42,12 +42,6 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
 
-        // TEST - usuń przed mergem do maina
-        val testRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
-            .setInitialDelay(10, TimeUnit.SECONDS)
-            .build()
-        WorkManager.getInstance(this).enqueue(testRequest)
-
         val prefs = getSharedPreferences("settings", 0)
         ReminderScheduler.schedule(this, prefs)
         TokenManager.init(applicationContext)
