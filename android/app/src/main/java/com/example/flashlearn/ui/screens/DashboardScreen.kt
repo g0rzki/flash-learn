@@ -2,6 +2,7 @@ package com.example.flashlearn.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -13,11 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.flashlearn.R
 import com.example.flashlearn.ui.profile.LogoutState
 import com.example.flashlearn.ui.profile.ProfileViewModel
 
@@ -27,14 +29,15 @@ fun DashboardScreen(
     onNavigateToSettings: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val logoutState by viewModel.logoutState.collectAsStateWithLifecycle()
+    val logoutState by viewModel.logoutState.collectAsState()
 
+    val userEmail = viewModel.email ?: "Użytkownik"
+    val joinDate = viewModel.registeredAt ?: "Brak danych"
 
-    val userEmail = viewModel.email ?: "Brak adresu email"
-    val joinDate = viewModel.registeredAt ?: "Nieznana data dołączenia"
+    val initials = userEmail.take(2).uppercase()
 
     LaunchedEffect(logoutState) {
-        if (logoutState is LogoutState.Done) {
+        if (logoutState == LogoutState.Done) {
             onLogout()
         }
     }
@@ -46,12 +49,29 @@ fun DashboardScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Mój Profil",
+            text = stringResource(R.string.profile_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(bottom = 32.dp)
+            modifier = Modifier.padding(bottom = 24.dp)
         )
+
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = initials,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -63,16 +83,18 @@ fun DashboardScreen(
             Column(modifier = Modifier.padding(20.dp)) {
                 ProfileInfoRow(
                     icon = { Icon(Icons.Default.Email, contentDescription = null) },
-                    label = "Email",
+                    label = stringResource(R.string.label_email_address), // Zmieniono
                     value = userEmail
                 )
-                HorizontalDivider(
+
+                Divider(
                     modifier = Modifier.padding(vertical = 16.dp),
                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                 )
+
                 ProfileInfoRow(
                     icon = { Icon(Icons.Default.DateRange, contentDescription = null) },
-                    label = "Dołączył(a)",
+                    label = stringResource(R.string.label_registered_at), // Zmieniono
                     value = joinDate
                 )
             }
@@ -113,7 +135,7 @@ fun DashboardScreen(
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
-            if (logoutState is LogoutState.Loading) {
+            if (logoutState == LogoutState.Loading) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onError,
                     modifier = Modifier.size(24.dp),
@@ -123,7 +145,7 @@ fun DashboardScreen(
                 Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Wyloguj się",
+                    text = stringResource(R.string.btn_logout), // Zmieniono
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
