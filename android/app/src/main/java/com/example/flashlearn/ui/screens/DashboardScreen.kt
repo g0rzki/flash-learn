@@ -2,33 +2,36 @@ package com.example.flashlearn.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.flashlearn.R
 import com.example.flashlearn.ui.profile.LogoutState
 import com.example.flashlearn.ui.profile.ProfileViewModel
 
 @Composable
 fun DashboardScreen(
     onLogout: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val logoutState by viewModel.logoutState.collectAsStateWithLifecycle()
+
+
+    val userEmail = viewModel.email ?: "Brak adresu email"
+    val joinDate = viewModel.registeredAt ?: "Nieznana data dołączenia"
 
     LaunchedEffect(logoutState) {
         if (logoutState is LogoutState.Done) {
@@ -36,110 +39,96 @@ fun DashboardScreen(
         }
     }
 
-    val email = viewModel.email ?: "–"
-    val registeredAt = viewModel.registeredAt ?: "–"
-    val initial = email.firstOrNull()?.uppercaseChar() ?: '?'
-    val isLoggingOut = logoutState is LogoutState.Loading
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 24.dp),
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(40.dp))
+        Text(
+            text = "Mój Profil",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
 
-        // Avatar z inicjałem
-        Box(
-            modifier = Modifier
-                .size(96.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
+            shape = RoundedCornerShape(16.dp)
         ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                ProfileInfoRow(
+                    icon = { Icon(Icons.Default.Email, contentDescription = null) },
+                    label = "Email",
+                    value = userEmail
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+                ProfileInfoRow(
+                    icon = { Icon(Icons.Default.DateRange, contentDescription = null) },
+                    label = "Dołączył(a)",
+                    value = joinDate
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onNavigateToSettings,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(Icons.Default.Settings, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = initial.toString(),
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                text = "Ustawienia aplikacji",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = stringResource(R.string.profile_title),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Karta z danymi
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                ProfileInfoRow(
-                    icon = { Icon(Icons.Default.Email, contentDescription = null) },
-                    label = stringResource(R.string.label_email_address),
-                    value = email
-                )
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 12.dp),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                )
-                ProfileInfoRow(
-                    icon = { Icon(Icons.Default.DateRange, contentDescription = null) },
-                    label = stringResource(R.string.label_registered_at),
-                    value = registeredAt
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Przycisk wylogowania
         Button(
-            onClick = { if (!isLoggingOut) viewModel.logout() },
+            onClick = { viewModel.logout() },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(14.dp),
+                .height(56.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError
             ),
-            enabled = !isLoggingOut
+            shape = RoundedCornerShape(12.dp)
         ) {
-            if (isLoggingOut) {
+            if (logoutState is LogoutState.Loading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(22.dp),
-                    strokeWidth = 2.5.dp,
-                    color = MaterialTheme.colorScheme.onErrorContainer
+                    color = MaterialTheme.colorScheme.onError,
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
                 )
             } else {
-                Icon(
-                    imageVector = Icons.Default.ExitToApp,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(Icons.Default.ExitToApp, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = stringResource(R.string.btn_logout),
-                    style = MaterialTheme.typography.labelLarge
+                    text = "Wyloguj się",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
