@@ -44,6 +44,7 @@ fun MainScreen(
     onLogout: () -> Unit,
     onNavigateToCreateDeck: () -> Unit = {},
     onNavigateToDeckDetail: (deckId: Long) -> Unit = {},
+    onNavigateToLearn: (deckId: Long) -> Unit = {},
     networkViewModel: NetworkViewModel = hiltViewModel()
 ) {
     val items = listOf(
@@ -139,7 +140,10 @@ fun MainScreen(
             }
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedItem) {
-                    BottomNavItem.Learn -> LearnScreen()
+                    BottomNavItem.Learn -> DeckListScreen(
+                        onNavigateToCreateDeck = onNavigateToCreateDeck,
+                        onNavigateToDeckDetail = onNavigateToLearn
+                    )
                     BottomNavItem.MyDecks -> DeckListScreen(
                         onNavigateToCreateDeck = onNavigateToCreateDeck,
                         onNavigateToDeckDetail = onNavigateToDeckDetail

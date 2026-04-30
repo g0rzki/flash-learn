@@ -16,6 +16,7 @@ import com.example.flashlearn.ui.screens.DeckEditScreen
 import com.example.flashlearn.ui.screens.FlashcardEditScreen
 import com.example.flashlearn.ui.screens.FlashcardListScreen
 import com.example.flashlearn.ui.screens.LoginScreen
+import com.example.flashlearn.ui.screens.LearnScreen
 import com.example.flashlearn.ui.screens.MainScreen
 import com.example.flashlearn.ui.screens.RegisterScreen
 import com.example.flashlearn.ui.theme.FlashLearnTheme
@@ -69,6 +70,9 @@ class MainActivity : ComponentActivity() {
                             },
                             onNavigateToDeckDetail = { deckId ->
                                 navController.navigate("deck/$deckId/detail")
+                            },
+                            onNavigateToLearn = { deckId ->
+                                navController.navigate("learn/$deckId")
                             }
                         )
                     }
@@ -95,8 +99,16 @@ class MainActivity : ComponentActivity() {
                         DeckDetailScreen(
                             deckId = deckId,
                             onNavigateBack = { navController.popBackStack() },
-                            onNavigateToLearn = { /* docelowo: navController.navigate("learn/$deckId") */ },
+                            onNavigateToLearn = { id -> navController.navigate("learn/$id") },
                             onNavigateToFlashcards = { id -> navController.navigate("deck/$id/flashcards") }
+                        )
+                    }
+                    composable(
+                        route = "learn/{deckId}",
+                        arguments = listOf(navArgument("deckId") { type = NavType.LongType })
+                    ) {
+                        LearnScreen(
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
                     composable(
