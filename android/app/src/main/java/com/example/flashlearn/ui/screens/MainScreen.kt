@@ -140,9 +140,8 @@ fun MainScreen(
             }
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedItem) {
-                    BottomNavItem.Learn -> DeckListScreen(
-                        onNavigateToCreateDeck = onNavigateToCreateDeck,
-                        onNavigateToDeckDetail = onNavigateToLearn
+                    BottomNavItem.Learn -> LearnHomeScreen(
+                        onNavigateToLearn = onNavigateToLearn
                     )
                     BottomNavItem.MyDecks -> DeckListScreen(
                         onNavigateToCreateDeck = onNavigateToCreateDeck,

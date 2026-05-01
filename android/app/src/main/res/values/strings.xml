@@ -144,4 +144,15 @@
     <string name="learn_rate_hard">Trudne</string>
     <string name="learn_rate_easy">Łatwe</string>
     <string name="learn_session_finished">Sesja zakończona!</string>
+    <string name="learn_repeat_session">Powtórz sesję</string>
+    <string name="learn_back_to_menu">Wróć do menu</string>
+
+    <!-- LearnHomeScreen -->
+    <string name="learn_home_title">Nauka</string>
+    <string name="learn_home_last_deck">Ostatnio uczona talia</string>
+    <string name="learn_home_start">Rozpocznij naukę</string>
+    <string name="learn_home_all_decks">Wszystkie talie</string>
+    <string name="learn_home_no_decks_title">Brak talii</string>
+    <string name="learn_home_no_decks_msg">Utwórz talię w zakładce „Moje talie", aby rozpocząć naukę.</string>
+    <string name="learn_home_pick_another">Wybierz inną talię</string>
 </resources>

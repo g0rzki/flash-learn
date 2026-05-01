@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -46,7 +47,11 @@ fun LearnScreen(
     ) {
         when (val state = uiState) {
             LearnUiState.Loading -> LearnLoadingContent()
-            is LearnUiState.Empty -> LearnEmptyContent(state.deckTitle, onNavigateBack)
+            is LearnUiState.Empty -> LearnEmptyContent(
+                state = state, 
+                onNavigateBack = onNavigateBack,
+                onLearnAnyway = viewModel::restartSession
+            )
             is LearnUiState.Session -> LearnSessionContent(
                 state = state,
                 onFlip = viewModel::flipCard,
@@ -56,6 +61,7 @@ fun LearnScreen(
             is LearnUiState.Finished -> LearnFinishedContent(
                 state = state,
                 onNavigateBack = onNavigateBack,
+                onRestart = viewModel::restartSession,
             )
         }
     }
@@ -73,7 +79,11 @@ private fun LearnLoadingContent() {
 // Empty
 
 @Composable
-private fun LearnEmptyContent(deckTitle: String, onNavigateBack: () -> Unit) {
+private fun LearnEmptyContent(
+    state: LearnUiState.Empty,
+    onNavigateBack: () -> Unit,
+    onLearnAnyway: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -89,20 +99,52 @@ private fun LearnEmptyContent(deckTitle: String, onNavigateBack: () -> Unit) {
         )
         Spacer(Modifier.height(24.dp))
         Text(
-            text = stringResource(R.string.learn_great_job),
+            text = if (state.hasCards) stringResource(R.string.learn_great_job) else stringResource(R.string.empty_flashcards_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = stringResource(R.string.learn_empty_message, deckTitle),
+            text = if (state.hasCards) stringResource(R.string.learn_empty_message, state.deckTitle) 
+                   else stringResource(R.string.empty_flashcards_message),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(32.dp))
-        OutlinedButton(onClick = onNavigateBack, shape = RoundedCornerShape(12.dp)) {
-            Text(stringResource(R.string.learn_back_to_deck))
+        
+        if (state.hasCards) {
+            Button(
+                onClick = onLearnAnyway,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Default.PlayArrow, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.learn_repeat_session), style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.height(12.dp))
+            OutlinedButton(
+                onClick = onNavigateBack,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(stringResource(R.string.learn_back_to_menu), style = MaterialTheme.typography.titleMedium)
+            }
+        } else {
+            OutlinedButton(
+                onClick = onNavigateBack,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(stringResource(R.string.learn_back_to_menu), style = MaterialTheme.typography.titleMedium)
+            }
         }
     }
 }
@@ -428,6 +470,7 @@ private fun RatingButton(
 private fun LearnFinishedContent(
     state: LearnUiState.Finished,
     onNavigateBack: () -> Unit,
+    onRestart: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -489,8 +532,9 @@ private fun LearnFinishedContent(
 
         Spacer(Modifier.height(36.dp))
 
+        // Repeat session button
         Button(
-            onClick = onNavigateBack,
+            onClick = onRestart,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
@@ -498,7 +542,20 @@ private fun LearnFinishedContent(
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.learn_back_to_deck), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.learn_repeat_session), style = MaterialTheme.typography.titleMedium)
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        // Back to menu button
+        OutlinedButton(
+            onClick = onNavigateBack,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(12.dp),
+        ) {
+            Text(stringResource(R.string.learn_back_to_menu), style = MaterialTheme.typography.titleMedium)
         }
     }
 }

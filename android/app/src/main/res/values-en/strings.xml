@@ -144,4 +144,15 @@
     <string name="learn_rate_hard">Hard</string>
     <string name="learn_rate_easy">Easy</string>
     <string name="learn_session_finished">Session finished!</string>
+    <string name="learn_repeat_session">Repeat session</string>
+    <string name="learn_back_to_menu">Back to menu</string>
+
+    <!-- LearnHomeScreen -->
+    <string name="learn_home_title">Learn</string>
+    <string name="learn_home_last_deck">Last learned deck</string>
+    <string name="learn_home_start">Start learning</string>
+    <string name="learn_home_all_decks">All decks</string>
+    <string name="learn_home_no_decks_title">No decks</string>
+    <string name="learn_home_no_decks_msg">Create a deck in the \"My decks\" tab to start learning.</string>
+    <string name="learn_home_pick_another">Pick another deck</string>
 </resources>

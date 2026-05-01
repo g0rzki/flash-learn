@@ -77,6 +77,27 @@ class LearnViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Restarts the session with all cards from the deck (ignores SM-2 due filter).
+     * Called when user taps "Repeat session" on the Finished screen.
+     */
+    fun restartSession() {
+        viewModelScope.launch {
+            _uiState.value = LearnUiState.Loading
+            knownCount = 0
+            hardCount = 0
+            unknownCount = 0
+            val allCards = flashcardDao.getByDeck(deckId)
+            if (allCards.isEmpty()) {
+                _uiState.value = LearnUiState.Empty(deckTitle, hasCards = false)
+                return@launch
+            }
+            queue = allCards
+            currentIndex = 0
+            showCard()
+        }
+    }
+
     // Private helpers
 
     private suspend fun loadSession() {
@@ -97,7 +118,7 @@ class LearnViewModel @Inject constructor(
         }
 
         if (dueCards.isEmpty()) {
-            _uiState.value = LearnUiState.Empty(deckTitle)
+            _uiState.value = LearnUiState.Empty(deckTitle, hasCards = allCards.isNotEmpty())
             return
         }
 

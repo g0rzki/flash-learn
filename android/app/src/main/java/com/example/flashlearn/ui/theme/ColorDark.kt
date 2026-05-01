@@ -19,7 +19,7 @@ val DarkTokens = ColorTokens(
     textFieldBorder           = NeutralVariant60,
 
     chipBackground            = Indigo30,
-    chipText                  = Indigo20,
+    chipText                  = Indigo90,
 
     cardCorrect               = Green80,
     cardCorrectText           = Green20,

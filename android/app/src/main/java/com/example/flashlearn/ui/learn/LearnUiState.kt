@@ -12,7 +12,7 @@ sealed interface LearnUiState {
     object Loading : LearnUiState
 
     /** Talia pusta lub brak fiszek do powtórki dziś. */
-    data class Empty(val deckTitle: String) : LearnUiState
+    data class Empty(val deckTitle: String, val hasCards: Boolean) : LearnUiState
 
     /** Aktywna sesja nauki. */
     data class Session(
