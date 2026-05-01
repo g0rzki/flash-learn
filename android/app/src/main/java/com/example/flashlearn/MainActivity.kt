@@ -9,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.flashlearn.data.local.TokenManager
 import com.example.flashlearn.data.remote.RetrofitClient
 import com.example.flashlearn.ui.screens.DeckDetailScreen
 import com.example.flashlearn.ui.screens.DeckEditScreen
@@ -26,12 +25,15 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        TokenManager.init(applicationContext)
+        
+        val prefs = applicationContext.getSharedPreferences("flashlearn_prefs", android.content.Context.MODE_PRIVATE)
+        val hasToken = prefs.getString("access_token", null) != null
+        
         enableEdgeToEdge()
         setContent {
             FlashLearnTheme {
                 val navController = rememberNavController()
-                val startDestination = if (TokenManager.getAccessToken() != null) "main" else "login"
+                val startDestination = if (hasToken) "main" else "login"
 
                 NavHost(
                     navController = navController,
@@ -60,7 +62,6 @@ class MainActivity : ComponentActivity() {
                     composable("main") {
                         MainScreen(
                             onLogout = {
-                                TokenManager.clearTokens()
                                 navController.navigate("login") {
                                     popUpTo(0)
                                 }

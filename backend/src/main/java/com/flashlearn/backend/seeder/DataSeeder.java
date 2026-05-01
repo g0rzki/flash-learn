@@ -39,7 +39,7 @@ public class DataSeeder implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         log.info("=== DataSeeder starting ===");
-        seedUser("test@test.com", "test1234", testDecks());
+        seedUser("tester@test.com", "test1234", testDecks());
         log.info("=== DataSeeder finished ===");
     }
 
@@ -130,7 +130,7 @@ public class DataSeeder implements ApplicationRunner {
         return h;
     }
 
-    // ── seed data: 4 decks × 2 flashcards = 8 flashcards total ───────────────
+    // ── seed data: 4 decks × 6 flashcards = 24 flashcards total ──────────────
 
     private List<SeedDeck> testDecks() {
         return List.of(
@@ -138,25 +138,57 @@ public class DataSeeder implements ApplicationRunner {
                 new SeedCard("What does 'ubiquitous' mean?",
                              "Present or found everywhere – wszechobecny"),
                 new SeedCard("What does 'eloquent' mean?",
-                             "Fluent and persuasive in speaking – elokwentny")
+                             "Fluent and persuasive in speaking – elokwentny"),
+                new SeedCard("What does 'meticulous' mean?",
+                             "Showing great attention to detail; very careful and precise – drobiazgowy"),
+                new SeedCard("What does 'resilient' mean?",
+                             "Able to withstand or recover quickly from difficult conditions – odporny, szybko wracający do siebie"),
+                new SeedCard("What does 'ambiguous' mean?",
+                             "Open to more than one interpretation; having a double meaning – dwuznaczny"),
+                new SeedCard("What does 'diligent' mean?",
+                             "Having or showing care and conscientiousness in one's work or duties – pilny, staranny")
             )),
             new SeedDeck("Matematyka dyskretna", "Podstawy matematyki dyskretnej", false, List.of(
                 new SeedCard("Co to jest graf skierowany?",
                              "Graf, w którym krawędzie mają określony kierunek (łuk)."),
                 new SeedCard("Co to jest drzewo rozpinające?",
-                             "Podgraf spójny i acykliczny zawierający wszystkie wierzchołki grafu.")
+                             "Podgraf spójny i acykliczny zawierający wszystkie wierzchołki grafu."),
+                new SeedCard("Co to jest graf dwudzielny?",
+                             "Graf, którego wierzchołki można podzielić na dwa rozłączne zbiory tak, aby krawędzie łączyły jedynie wierzchołki z różnych zbiorów."),
+                new SeedCard("Czym jest cykl Eulera?",
+                             "Cykl w grafie, który przechodzi przez każdą krawędź dokładnie jeden raz."),
+                new SeedCard("Co to jest relacja równoważności?",
+                             "Relacja, która jest jednocześnie zwrotna, symetryczna i przechodnia."),
+                new SeedCard("Ile wynosi suma stopni wierzchołków w dowolnym grafie?",
+                             "Suma stopni wszystkich wierzchołków jest równa podwojonej liczbie krawędzi w tym grafie (Lemat o uściskach dłoni).")
             )),
             new SeedDeck("Algorytmy i struktury danych", "Sortowanie, złożoność, struktury", false, List.of(
                 new SeedCard("Jaka jest złożoność QuickSort (średni przypadek)?",
                              "O(n log n)"),
                 new SeedCard("Co to jest stos (stack)?",
-                             "Struktura danych LIFO – Last In First Out. Operacje: push i pop.")
+                             "Struktura danych LIFO – Last In First Out. Operacje: push i pop."),
+                new SeedCard("Co to jest kolejka (queue)?",
+                             "Struktura danych FIFO – First In First Out. Elementy dodaje się na koniec, a pobiera z początku."),
+                new SeedCard("Na czym polega wyszukiwanie binarne (Binary Search)?",
+                             "Wyszukiwanie elementu w posortowanej tablicy poprzez wielokrotny podział przedziału poszukiwań na połowy. Złożoność: O(log n)."),
+                new SeedCard("Co to jest tablica mieszająca (Hash Table)?",
+                             "Struktura danych mapująca klucze na wartości za pomocą funkcji haszującej w celu szybkiego wyszukiwania, dodawania i usuwania (O(1) w średnim przypadku)."),
+                new SeedCard("Jaka jest optymalna złożoność algorytmu Merge Sort?",
+                             "O(n log n) we wszystkich przypadkach: optymistycznym, średnim i pesymistycznym.")
             )),
             new SeedDeck("Systemy Operacyjne", "Podstawowe pojęcia z SO", false, List.of(
                 new SeedCard("Co to jest zakleszczenie (deadlock)?",
-                             "Stan, w którym procesy czekają na zasoby zajęte przez siebie nawzajem."),
+                             "Stan, w którym procesy czekają na zasoby zajęte przez siebie nawzajem, co uniemożliwia ich dalsze wykonanie."),
                 new SeedCard("Czym różni się proces od wątku?",
-                             "Proces ma własną przestrzeń adresową. Wątki współdzielą przestrzeń procesu.")
+                             "Proces ma własną przestrzeń adresową i zasoby. Wątki działają w ramach jednego procesu i współdzielą jego przestrzeń."),
+                new SeedCard("Co to jest stronicowanie pamięci (paging)?",
+                             "Mechanizm zarządzania pamięcią dzielący pamięć fizyczną na ramki, a logiczną na strony o stałym rozmiarze, by zminimalizować fragmentację zewnętrzną."),
+                new SeedCard("Do czego służy semafor w SO?",
+                             "Do synchronizacji procesów/wątków. Jest to zmienna ułatwiająca wzajemne wykluczanie dostępu do zasobów krytycznych."),
+                new SeedCard("Co to jest system plików (file system)?",
+                             "Sposób oraz struktura logiczna używana przez system operacyjny do kontrolowania, jak dane są zapisywane i odczytywane na nośniku."),
+                new SeedCard("Na czym polega wywłaszczanie (preemption)?",
+                             "Na czasowym przerwaniu przez SO wykonywania procesu (bez jego zgody), by przekazać procesor innemu procesowi (np. z powodu przerwania zegarowego).")
             ))
         );
     }
