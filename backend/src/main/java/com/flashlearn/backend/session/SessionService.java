@@ -21,8 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SessionService {
 
-    private static final double MIN_EASE_FACTOR = 1.3;
-
+    
+    private final Sm2Calculator sm2Calculator;
     private final StudySessionRepository studySessionRepository;
     private final UserFlashcardProgressRepository progressRepository;
     private final FlashcardRepository flashcardRepository;
@@ -106,39 +106,31 @@ public class SessionService {
                 .orElseGet(() -> UserFlashcardProgress.builder()
                         .user(user)
                         .flashcard(flashcard)
-                        .easeFactor(2.5)
+                        .easeFactor(Sm2Calculator.DEFAULT_EASE_FACTOR)
                         .intervalDays(1)
                         .repetitions(0)
                         .nextReviewDate(LocalDate.now())
                         .build());
 
-        if (rating == 0) {
-            // Nie wiem — reset powtórek, jutro ponownie
-            progress.setRepetitions(0);
-            progress.setIntervalDays(1);
-            progress.setNextReviewDate(LocalDate.now().plusDays(1));
-        } else {
-            // Trudne (1) lub Łatwe (2) — oblicz nowy interwał
-            int q = rating == 2 ? 5 : 3; // mapowanie oceny na skale SM-2 (0-5)
+         // mapowanie rating (0/1/2) → quality SM-2 (0–5)
+        int quality = switch (rating) {
+            case 0 -> 1;  // nie wiem   → quality 1 (prawie blackout)
+            case 1 -> 3;  // trudne     → quality 3 (poprawne z trudnością)
+            case 2 -> 5;  // łatwe      → quality 5 (idealne)
+            default -> throw new IllegalArgumentException("Invalid rating: " + rating);
+        };
 
-            double newEF = progress.getEaseFactor() + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-            newEF = Math.max(MIN_EASE_FACTOR, newEF);
+        Sm2Calculator.Sm2Result result = sm2Calculator.calculate(
+            quality,
+            progress.getEaseFactor(),   // EF z bazy — sanityzowany wewnątrz
+            progress.getIntervalDays(),
+            progress.getRepetitions()
+        );
 
-            int newInterval;
-            int reps = progress.getRepetitions();
-            if (reps == 0) {
-                newInterval = 1;
-            } else if (reps == 1) {
-                newInterval = 6;
-            } else {
-                newInterval = (int) Math.round(progress.getIntervalDays() * newEF);
-            }
-
-            progress.setEaseFactor(newEF);
-            progress.setIntervalDays(newInterval);
-            progress.setRepetitions(reps + 1);
-            progress.setNextReviewDate(LocalDate.now().plusDays(newInterval));
-        }
+        progress.setEaseFactor(result.easeFactor());
+        progress.setIntervalDays(result.intervalDays());
+        progress.setRepetitions(result.repetitions());
+        progress.setNextReviewDate(result.nextReviewDate());
 
         progressRepository.save(progress);
     }
