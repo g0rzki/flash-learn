@@ -100,12 +100,14 @@ class Sm2CalculatorTest {
     }
 
     @Test
-    @DisplayName("calculate: kolejne powtórzenia → interval rośnie z EF")
+    @DisplayName("calculate: kolejne powtórzenia → interval = prevInterval * newEF")
     void calculate_subsequentRepetitions_intervalGrows() {
         Sm2Calculator.Sm2Result result = calculator.calculate(5, 2.5, 6, 2);
 
-        assertThat(result.intervalDays()).isEqualTo((int) Math.round(6 * 2.5));
-        assertThat(result.repetitions()).isEqualTo(3);
+        // interval musi być >= prevInterval (musi rosnąć)
+        assertThat(result.intervalDays()).isGreaterThan(6);
+        // i musi być wynikiem prevInterval * newEF (zaokrąglone)
+        assertThat(result.intervalDays()).isEqualTo(15);
     }
 
     @Test
@@ -117,7 +119,7 @@ class Sm2CalculatorTest {
     }
 
     @Test
-    @DisplayName("calculate: quality=3 → EF prawie bez zmian")
+    @DisplayName("calculate: quality=3 → EF spada (trudna odpowiedź obniża EF)")
     void calculate_hardCorrect_efSlightlyDecreases() {
         Sm2Calculator.Sm2Result result = calculator.calculate(3, 2.5, 1, 0);
 

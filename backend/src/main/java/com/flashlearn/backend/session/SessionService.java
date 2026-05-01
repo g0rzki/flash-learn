@@ -2,13 +2,14 @@ package com.flashlearn.backend.session;
 
 import com.flashlearn.backend.exception.DeckNotFoundException;
 import com.flashlearn.backend.exception.FlashcardNotFoundException;
+import com.flashlearn.backend.exception.UserNotFoundException;
 import com.flashlearn.backend.model.*;
 import com.flashlearn.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.security.core.Authentication;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +40,14 @@ public class SessionService {
      */
     @Transactional
     public SessionResponse save(SessionRequest request) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Authentication authentication = 
+        SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+        throw new RuntimeException("No authentication in context");
+        }
+        String email = authentication.getName();
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(email));
 
         Deck deck = deckRepository.findById(request.getDeckId())
                 .orElseThrow(() -> new DeckNotFoundException(request.getDeckId()));

@@ -40,7 +40,7 @@ public class Sm2Calculator {
             newInterval = switch (repetitions) {
                 case 0  -> 1;
                 case 1  -> 6;
-                default -> (int) Math.round(prevInterval * ef);
+                default -> (int) Math.round(prevInterval * newEF);
             };
         }
 
