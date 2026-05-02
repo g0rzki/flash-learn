@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -33,7 +34,6 @@ import com.example.flashlearn.R
 import com.example.flashlearn.ui.learn.LearnUiState
 import com.example.flashlearn.ui.learn.LearnViewModel
 
-
 @Composable
 fun LearnScreen(
     onNavigateBack: () -> Unit,
@@ -48,7 +48,7 @@ fun LearnScreen(
         when (val state = uiState) {
             LearnUiState.Loading -> LearnLoadingContent()
             is LearnUiState.Empty -> LearnEmptyContent(
-                state = state, 
+                state = state,
                 onNavigateBack = onNavigateBack,
                 onLearnAnyway = viewModel::restartSession
             )
@@ -105,14 +105,14 @@ private fun LearnEmptyContent(
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = if (state.hasCards) stringResource(R.string.learn_empty_message, state.deckTitle) 
-                   else stringResource(R.string.empty_flashcards_message),
+            text = if (state.hasCards) stringResource(R.string.learn_empty_message, state.deckTitle)
+            else stringResource(R.string.empty_flashcards_message),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(32.dp))
-        
+
         if (state.hasCards) {
             Button(
                 onClick = onLearnAnyway,
@@ -171,7 +171,7 @@ private fun LearnSessionContent(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wróć")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.content_desc_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -400,36 +400,35 @@ private fun RatingButtons(visible: Boolean, onRate: (Int) -> Unit) {
             .graphicsLayer { this.alpha = alpha },
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        // Nie wiem — grade 0
+        // Łatwe — grade 3
         RatingButton(
             modifier = Modifier.weight(1f),
-            label = stringResource(R.string.learn_rate_unknown),
-            emoji = "😕",
-            containerColor = MaterialTheme.colorScheme.errorContainer,
-            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-            onClick = { if (visible) onRate(0) },
+            label = stringResource(R.string.learn_rate_easy),
+            emoji = "😎",
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            onClick = { if (visible) onRate(3) },
         )
         // Trudne — grade 1
         RatingButton(
             modifier = Modifier.weight(1f),
             label = stringResource(R.string.learn_rate_hard),
-            emoji = "😐",
+            emoji = "🤔",
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             onClick = { if (visible) onRate(1) },
         )
-        // Łatwe — grade 3
+        // Nie wiem — grade 0
         RatingButton(
             modifier = Modifier.weight(1f),
-            label = stringResource(R.string.learn_rate_easy),
-            emoji = "😊",
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            onClick = { if (visible) onRate(3) },
+            label = stringResource(R.string.learn_rate_unknown),
+            emoji = "🤯",
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            onClick = { if (visible) onRate(0) },
         )
     }
 }
-
 @Composable
 private fun RatingButton(
     modifier: Modifier = Modifier,
@@ -464,7 +463,6 @@ private fun RatingButton(
     }
 }
 
-// Finished
 
 @Composable
 private fun LearnFinishedContent(
@@ -472,6 +470,28 @@ private fun LearnFinishedContent(
     onNavigateBack: () -> Unit,
     onRestart: () -> Unit,
 ) {
+    val textNone = stringResource(R.string.learn_next_session_none)
+    val textToday = stringResource(R.string.learn_next_session_today)
+    val textTomorrow = stringResource(R.string.learn_next_session_tomorrow)
+    val textDayAfter = stringResource(R.string.learn_next_session_day_after)
+
+    val nextSessionText = remember(state.nextSessionEpochDay) {
+        if (state.nextSessionEpochDay == null) textNone
+        else {
+            val today = java.time.LocalDate.now().toEpochDay()
+            val diff = state.nextSessionEpochDay - today
+            when {
+                diff <= 0 -> textToday
+                diff == 1L -> textTomorrow
+                diff == 2L -> textDayAfter
+                else -> {
+                    val date = java.time.LocalDate.ofEpochDay(state.nextSessionEpochDay)
+                    date.format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy"))
+                }
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -497,16 +517,24 @@ private fun LearnFinishedContent(
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = stringResource(R.string.learn_cards_completed, state.totalCards),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.primary
+        )
+
         Spacer(Modifier.height(32.dp))
 
-        // Summary cards
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             SummaryChip(
                 modifier = Modifier.weight(1f),
-                emoji = "😊",
+                emoji = "😎",
                 label = stringResource(R.string.learn_rate_easy),
                 count = state.knownCount,
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -514,7 +542,7 @@ private fun LearnFinishedContent(
             )
             SummaryChip(
                 modifier = Modifier.weight(1f),
-                emoji = "😐",
+                emoji = "🤔",
                 label = stringResource(R.string.learn_rate_hard),
                 count = state.hardCount,
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -522,7 +550,7 @@ private fun LearnFinishedContent(
             )
             SummaryChip(
                 modifier = Modifier.weight(1f),
-                emoji = "😕",
+                emoji = "🤯",
                 label = stringResource(R.string.learn_rate_unknown),
                 count = state.unknownCount,
                 containerColor = MaterialTheme.colorScheme.errorContainer,
@@ -530,9 +558,49 @@ private fun LearnFinishedContent(
             )
         }
 
+        Spacer(Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = stringResource(R.string.learn_next_session_label),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = nextSessionText,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
+
         Spacer(Modifier.height(36.dp))
 
-        // Repeat session button
         Button(
             onClick = onRestart,
             modifier = Modifier
@@ -547,7 +615,6 @@ private fun LearnFinishedContent(
 
         Spacer(Modifier.height(12.dp))
 
-        // Back to menu button
         OutlinedButton(
             onClick = onNavigateBack,
             modifier = Modifier
@@ -555,7 +622,7 @@ private fun LearnFinishedContent(
                 .height(52.dp),
             shape = RoundedCornerShape(12.dp),
         ) {
-            Text(stringResource(R.string.learn_back_to_menu), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.learn_back_to_decks), style = MaterialTheme.typography.titleMedium)
         }
     }
 }

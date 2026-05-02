@@ -36,5 +36,6 @@ sealed interface LearnUiState {
         val knownCount: Int,   // ocena 3 (Łatwe)
         val hardCount: Int,    // ocena 1 (Trudne)
         val unknownCount: Int, // ocena 0 (Nie wiem)
+        val nextSessionEpochDay: Long?
     ) : LearnUiState
 }
