@@ -1,5 +1,8 @@
 package com.example.flashlearn.data.repository
 
+import android.util.Log
+import com.example.flashlearn.data.remote.DeckApiService
+
 import com.flashlearn.data.dao.DeckDao
 import com.flashlearn.data.dao.DeckWithCount
 import com.flashlearn.data.entity.Deck
@@ -11,11 +14,14 @@ import javax.inject.Singleton
 @Singleton
 class DeckRepository @Inject constructor(
     private val deckDao: DeckDao,
-    private val syncManager: com.example.flashlearn.sync.SyncManager
+    private val syncManager: com.example.flashlearn.sync.SyncManager,
+    private val deckApi: DeckApiService
 ) {
     fun observeAllDecks(): Flow<List<Deck>> = deckDao.observeAll()
 
     fun observeAllDecksWithCount(): Flow<List<DeckWithCount>> = deckDao.observeAllWithCount()
+
+    suspend fun getDeckById(id: Long): Deck? = deckDao.getById(id)
 
     suspend fun createDeck(title: String, description: String? = null): Long {
         val deck = Deck(
@@ -29,12 +35,40 @@ class DeckRepository @Inject constructor(
         return id
     }
 
+    suspend fun updateDeck(id: Long, title: String, description: String?) {
+        val existing = deckDao.getById(id) ?: return
+        deckDao.update(
+            existing.copy(
+                title = title,
+                description = description,
+                updatedAt = Instant.now().epochSecond,
+                needsSync = true
+            )
+        )
+        syncManager.scheduleSync()
+    }
+
     suspend fun deleteDeck(deck: Deck) {
+        if (deck.serverId != null) {
+            try {
+                deckApi.deleteDeck(deck.serverId)
+            } catch (e: Exception) {
+                Log.e("DeckRepository", "Failed to delete deck from server", e)
+            }
+        }
         deckDao.delete(deck)
         syncManager.scheduleSync()
     }
 
     suspend fun deleteDeckById(id: Long) {
+        val deck = deckDao.getById(id)
+        if (deck != null && deck.serverId != null) {
+            try {
+                deckApi.deleteDeck(deck.serverId)
+            } catch (e: Exception) {
+                Log.e("DeckRepository", "Failed to delete deck from server", e)
+            }
+        }
         deckDao.deleteById(id)
         syncManager.scheduleSync()
     }

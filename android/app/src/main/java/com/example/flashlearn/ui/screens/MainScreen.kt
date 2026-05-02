@@ -29,7 +29,7 @@ import kotlinx.coroutines.delay
 
 sealed class BottomNavItem(
     val route: String,
-    @StringRes val titleRes: Int,
+    @param:StringRes val titleRes: Int,
     val icon: ImageVector
 ) {
     object Learn : BottomNavItem("learn", R.string.nav_learn, Icons.Default.PlayArrow)

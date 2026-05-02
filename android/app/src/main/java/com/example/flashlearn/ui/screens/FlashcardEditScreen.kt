@@ -10,107 +10,28 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.flashlearn.R
-import com.flashlearn.data.db.AppDatabase
-import com.flashlearn.data.entity.Flashcard
-import kotlinx.coroutines.launch
-import java.time.Instant
-
-private const val FIELD_MAX = 500
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FlashcardEditScreen(
-    deckId: Long? = null,
-    flashcardId: Long? = null,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    viewModel: FlashcardEditViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val dao = remember { AppDatabase.getInstance(context).flashcardDao() }
-    val scope = rememberCoroutineScope()
-
-    val isEditMode = flashcardId != null
-
-    var resolvedDeckId by remember { mutableStateOf(deckId ?: 0L) }
-    var question by remember { mutableStateOf("") }
-    var answer by remember { mutableStateOf("") }
-    var questionError by remember { mutableStateOf<String?>(null) }
-    var answerError by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(isEditMode) }
-    var isSaving by remember { mutableStateOf(false) }
+    val uiState by viewModel.uiState.collectAsState()
 
     val errQuestionRequired = stringResource(R.string.error_question_required)
-    val errQuestionMax = stringResource(R.string.error_question_max)
-    val errAnswerRequired = stringResource(R.string.error_answer_required)
-    val errAnswerMax = stringResource(R.string.error_answer_max)
+    val errQuestionMax      = stringResource(R.string.error_question_max)
+    val errAnswerRequired   = stringResource(R.string.error_answer_required)
+    val errAnswerMax        = stringResource(R.string.error_answer_max)
 
-    LaunchedEffect(flashcardId) {
-        if (flashcardId != null) {
-            val flashcard = dao.getById(flashcardId)
-            if (flashcard != null) {
-                resolvedDeckId = flashcard.deckId
-                question = flashcard.question
-                answer = flashcard.answer
-            }
-            isLoading = false
-        }
-    }
+    val isEditMode = uiState.question.isNotEmpty() || uiState.answer.isNotEmpty()
 
-    fun validateQuestion(): Boolean {
-        questionError = when {
-            question.isBlank() -> errQuestionRequired
-            question.length > FIELD_MAX -> String.format(errQuestionMax, FIELD_MAX)
-            else -> null
-        }
-        return questionError == null
-    }
-
-    fun validateAnswer(): Boolean {
-        answerError = when {
-            answer.isBlank() -> errAnswerRequired
-            answer.length > FIELD_MAX -> String.format(errAnswerMax, FIELD_MAX)
-            else -> null
-        }
-        return answerError == null
-    }
-
-    fun save() {
-        val questionOk = validateQuestion()
-        val answerOk = validateAnswer()
-        if (!questionOk || !answerOk) return
-
-        isSaving = true
-        scope.launch {
-            val now = Instant.now().epochSecond
-            if (isEditMode && flashcardId != null) {
-                val existing = dao.getById(flashcardId)
-                if (existing != null) {
-                    dao.update(
-                        existing.copy(
-                            question = question.trim(),
-                            answer = answer.trim(),
-                            updatedAt = now,
-                            needsSync = true
-                        )
-                    )
-                }
-            } else {
-                dao.insert(
-                    Flashcard(
-                        deckId = resolvedDeckId,
-                        question = question.trim(),
-                        answer = answer.trim(),
-                        needsSync = true
-                    )
-                )
-            }
-            com.example.flashlearn.sync.SyncManager(context.applicationContext).scheduleSync()
-            isSaving = false
-            onNavigateBack()
-        }
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) onNavigateBack()
     }
 
     Scaffold(
@@ -129,8 +50,10 @@ fun FlashcardEditScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { save() },
-                        enabled = !isLoading && !isSaving
+                        onClick = {
+                            viewModel.save(errQuestionRequired, errQuestionMax, errAnswerRequired, errAnswerMax)
+                        },
+                        enabled = !uiState.isLoading && !uiState.isSaving
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
@@ -148,7 +71,7 @@ fun FlashcardEditScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        if (isLoading) {
+        if (uiState.isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -167,25 +90,22 @@ fun FlashcardEditScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 OutlinedTextField(
-                    value = question,
-                    onValueChange = {
-                        if (it.length <= FIELD_MAX) question = it
-                        if (questionError != null) validateQuestion()
-                    },
+                    value = uiState.question,
+                    onValueChange = viewModel::onQuestionChange,
                     label = { Text(stringResource(R.string.label_question)) },
-                    isError = questionError != null,
+                    isError = uiState.questionError != null,
                     supportingText = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = questionError ?: "",
-                                color = if (questionError != null) MaterialTheme.colorScheme.error
+                                text = uiState.questionError ?: "",
+                                color = if (uiState.questionError != null) MaterialTheme.colorScheme.error
                                         else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "${question.length}/$FIELD_MAX",
+                                text = "${uiState.question.length}/${FlashcardEditViewModel.FIELD_MAX}",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -196,25 +116,22 @@ fun FlashcardEditScreen(
                 )
 
                 OutlinedTextField(
-                    value = answer,
-                    onValueChange = {
-                        if (it.length <= FIELD_MAX) answer = it
-                        if (answerError != null) validateAnswer()
-                    },
+                    value = uiState.answer,
+                    onValueChange = viewModel::onAnswerChange,
                     label = { Text(stringResource(R.string.label_answer)) },
-                    isError = answerError != null,
+                    isError = uiState.answerError != null,
                     supportingText = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = answerError ?: "",
-                                color = if (answerError != null) MaterialTheme.colorScheme.error
+                                text = uiState.answerError ?: "",
+                                color = if (uiState.answerError != null) MaterialTheme.colorScheme.error
                                         else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "${answer.length}/$FIELD_MAX",
+                                text = "${uiState.answer.length}/${FlashcardEditViewModel.FIELD_MAX}",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -225,11 +142,13 @@ fun FlashcardEditScreen(
                 )
 
                 Button(
-                    onClick = { save() },
-                    enabled = !isSaving,
+                    onClick = {
+                        viewModel.save(errQuestionRequired, errQuestionMax, errAnswerRequired, errAnswerMax)
+                    },
+                    enabled = !uiState.isSaving,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (isSaving) {
+                    if (uiState.isSaving) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
                             color = MaterialTheme.colorScheme.onPrimary,

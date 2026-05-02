@@ -97,6 +97,7 @@ abstract class AppDatabase : RoomDatabase() {
                 DB_NAME,
             )
                 .addMigrations(MIGRATION_1_2)
+                .fallbackToDestructiveMigrationOnDowngrade()
                 .build()
 
         /**

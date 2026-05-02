@@ -144,7 +144,7 @@ fun CreateScreen(
                         supportingText = deckError?.let { { Text(it) } },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                     )
                     ExposedDropdownMenu(
                         expanded = dropdownExpanded,
