@@ -43,6 +43,8 @@ class LearnViewModel @Inject constructor(
 
     private var deckTitle = ""
 
+    private var earliestNextReview: Long? = null
+
     // Init
 
     init {
@@ -87,6 +89,7 @@ class LearnViewModel @Inject constructor(
             knownCount = 0
             hardCount = 0
             unknownCount = 0
+            earliestNextReview = null
             val allCards = flashcardDao.getByDeck(deckId)
             if (allCards.isEmpty()) {
                 _uiState.value = LearnUiState.Empty(deckTitle, hasCards = false)
@@ -102,6 +105,7 @@ class LearnViewModel @Inject constructor(
 
     private suspend fun loadSession() {
         _uiState.value = LearnUiState.Loading
+        earliestNextReview = null
 
         // Fetch deck title
         val deck = deckDao.getById(deckId)
@@ -135,6 +139,7 @@ class LearnViewModel @Inject constructor(
                 knownCount = knownCount,
                 hardCount = hardCount,
                 unknownCount = unknownCount,
+                nextSessionEpochDay = earliestNextReview
             )
             return
         }
@@ -172,6 +177,10 @@ class LearnViewModel @Inject constructor(
             intervalDays = interval,
             repetitions = reps,
         )
+
+        val nextReviewDay = result.nextReviewDate.toEpochDay()
+
+        earliestNextReview = minOf(earliestNextReview ?: nextReviewDay, nextReviewDay)
 
         if (currentProgress == null) {
             // First time — insert a new record
