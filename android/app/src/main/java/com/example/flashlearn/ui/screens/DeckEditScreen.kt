@@ -10,92 +10,27 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.flashlearn.R
-import com.flashlearn.data.db.AppDatabase
-import com.flashlearn.data.entity.Deck
-import kotlinx.coroutines.launch
-import java.time.Instant
-
-private const val TITLE_MIN = 3
-private const val TITLE_MAX = 100
-private const val DESC_MAX = 500
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeckEditScreen(
-    deckId: Long? = null,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    viewModel: DeckEditViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val dao = remember { AppDatabase.getInstance(context).deckDao() }
-    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
 
-    val isEditMode = deckId != null
-
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var titleError by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(isEditMode) }
-    var isSaving by remember { mutableStateOf(false) }
-
-    val errTitleRequired = stringResource(R.string.error_title_required)
+    val errTitleRequired  = stringResource(R.string.error_title_required)
     val errTitleMinLength = stringResource(R.string.error_title_min_length)
     val errTitleMaxLength = stringResource(R.string.error_title_max_length)
 
-    LaunchedEffect(deckId) {
-        if (deckId != null) {
-            val deck = dao.getById(deckId)
-            if (deck != null) {
-                title = deck.title
-                description = deck.description ?: ""
-            }
-            isLoading = false
-        }
-    }
+    val isEditMode = uiState.title.isNotEmpty() || uiState.description.isNotEmpty()
 
-    fun validateTitle(): Boolean {
-        titleError = when {
-            title.isBlank() -> errTitleRequired
-            title.trim().length < TITLE_MIN -> String.format(errTitleMinLength, TITLE_MIN)
-            title.length > TITLE_MAX -> String.format(errTitleMaxLength, TITLE_MAX)
-            else -> null
-        }
-        return titleError == null
-    }
-
-    fun save() {
-        if (!validateTitle()) return
-
-        isSaving = true
-        scope.launch {
-            val now = Instant.now().epochSecond
-            if (isEditMode && deckId != null) {
-                val existing = dao.getById(deckId)
-                if (existing != null) {
-                    dao.update(
-                        existing.copy(
-                            title = title.trim(),
-                            description = description.trim().ifBlank { null },
-                            updatedAt = now,
-                            needsSync = true
-                        )
-                    )
-                }
-            } else {
-                dao.insert(
-                    Deck(
-                        title = title.trim(),
-                        description = description.trim().ifBlank { null },
-                        needsSync = true
-                    )
-                )
-            }
-            isSaving = false
-            onNavigateBack()
-        }
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) onNavigateBack()
     }
 
     Scaffold(
@@ -114,8 +49,10 @@ fun DeckEditScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { save() },
-                        enabled = !isLoading && !isSaving
+                        onClick = {
+                            viewModel.save(errTitleRequired, errTitleMinLength, errTitleMaxLength)
+                        },
+                        enabled = !uiState.isLoading && !uiState.isSaving
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
@@ -133,7 +70,7 @@ fun DeckEditScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        if (isLoading) {
+        if (uiState.isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -152,25 +89,22 @@ fun DeckEditScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 OutlinedTextField(
-                    value = title,
-                    onValueChange = {
-                        if (it.length <= TITLE_MAX) title = it
-                        if (titleError != null) validateTitle()
-                    },
+                    value = uiState.title,
+                    onValueChange = viewModel::onTitleChange,
                     label = { Text(stringResource(R.string.label_deck_name)) },
-                    isError = titleError != null,
+                    isError = uiState.titleError != null,
                     supportingText = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = titleError ?: "",
-                                color = if (titleError != null) MaterialTheme.colorScheme.error
+                                text = uiState.titleError ?: "",
+                                color = if (uiState.titleError != null) MaterialTheme.colorScheme.error
                                         else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "${title.length}/$TITLE_MAX",
+                                text = "${uiState.title.length}/${DeckEditViewModel.TITLE_MAX}",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -180,14 +114,12 @@ fun DeckEditScreen(
                 )
 
                 OutlinedTextField(
-                    value = description,
-                    onValueChange = {
-                        if (it.length <= DESC_MAX) description = it
-                    },
+                    value = uiState.description,
+                    onValueChange = viewModel::onDescriptionChange,
                     label = { Text(stringResource(R.string.label_description_optional)) },
                     supportingText = {
                         Text(
-                            text = "${description.length}/$DESC_MAX",
+                            text = "${uiState.description.length}/${DeckEditViewModel.DESC_MAX}",
                             modifier = Modifier.fillMaxWidth(),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -198,11 +130,13 @@ fun DeckEditScreen(
                 )
 
                 Button(
-                    onClick = { save() },
-                    enabled = !isSaving,
+                    onClick = {
+                        viewModel.save(errTitleRequired, errTitleMinLength, errTitleMaxLength)
+                    },
+                    enabled = !uiState.isSaving,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (isSaving) {
+                    if (uiState.isSaving) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
                             color = MaterialTheme.colorScheme.onPrimary,

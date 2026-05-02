@@ -22,6 +22,7 @@ class LearnViewModel @Inject constructor(
     private val flashcardDao: FlashcardDao,
     private val flashcardProgressDao: FlashcardProgressDao,
     private val deckDao: DeckDao,
+    private val syncManager: com.example.flashlearn.sync.SyncManager,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -141,6 +142,7 @@ class LearnViewModel @Inject constructor(
                 unknownCount = unknownCount,
                 nextSessionEpochDay = earliestNextReview
             )
+            syncManager.scheduleSync()
             return
         }
 

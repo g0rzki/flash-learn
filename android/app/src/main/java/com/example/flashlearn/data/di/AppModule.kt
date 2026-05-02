@@ -5,8 +5,12 @@ import android.content.SharedPreferences
 import com.example.flashlearn.data.AuthRepositoryImpl
 import com.example.flashlearn.data.remote.AuthApiService
 import com.example.flashlearn.data.remote.RetrofitClient
+import com.example.flashlearn.data.remote.DeckApiService
+import com.example.flashlearn.data.remote.FlashcardApiService
 import com.example.flashlearn.data.repository.DeckRepository
+import com.example.flashlearn.data.repository.FlashcardRepository
 import com.example.flashlearn.domain.repository.AuthRepository
+import com.example.flashlearn.sync.SyncManager
 import com.flashlearn.data.dao.DeckDao
 import com.flashlearn.data.dao.FlashcardDao
 import com.flashlearn.data.dao.FlashcardProgressDao
@@ -42,7 +46,27 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDeckRepository(deckDao: DeckDao): DeckRepository = DeckRepository(deckDao)
+    fun provideSyncManager(@ApplicationContext context: Context): SyncManager =
+        SyncManager(context)
+
+    @Provides
+    @Singleton
+    fun provideDeckRepository(
+        deckDao: DeckDao, 
+        syncManager: SyncManager,
+        deckApi: DeckApiService
+    ): DeckRepository =
+        DeckRepository(deckDao, syncManager, deckApi)
+
+    @Provides
+    @Singleton
+    fun provideFlashcardRepository(
+        flashcardDao: FlashcardDao, 
+        deckDao: DeckDao, 
+        syncManager: SyncManager,
+        flashcardApi: FlashcardApiService
+    ): FlashcardRepository =
+        FlashcardRepository(flashcardDao, deckDao, syncManager, flashcardApi)
 
     @Provides
     @Singleton
@@ -54,6 +78,18 @@ object AppModule {
     @Singleton
     fun provideSyncApiService(): com.example.flashlearn.data.remote.SyncApiService {
         return RetrofitClient.syncApi
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeckApiService(): DeckApiService {
+        return RetrofitClient.deckApi
+    }
+
+    @Provides
+    @Singleton
+    fun provideFlashcardApiService(): FlashcardApiService {
+        return RetrofitClient.flashcardApi
     }
 
     @Provides
