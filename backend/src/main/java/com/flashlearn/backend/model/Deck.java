@@ -18,10 +18,6 @@ public class Deck {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    /**
-     * Kategoria talii — opcjonalna. Null oznacza brak kategorii (np. "Inne").
-     * Uzywana w Marketplace do filtrowania i wyswietlania ikon.
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
@@ -34,6 +30,14 @@ public class Deck {
 
     @Column(name = "is_public", nullable = false)
     private boolean isPublic = false;
+
+    /**
+     * Liczba klonowań talii przez innych użytkowników.
+     * Inkrementowana przy POST /marketplace/{id}/clone.
+     * Używana do sortowania w Marketplace.
+     */
+    @Column(name = "download_count", nullable = false)
+    private long downloadCount = 0;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
