@@ -7,18 +7,22 @@ import com.flashlearn.backend.model.User;
 import com.flashlearn.backend.repository.DeckRepository;
 import com.flashlearn.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Serwis obsługujący Marketplace — publiczne talie dostępne do klonowania.
  * Endpointy GET /marketplace są publiczne (bez JWT).
  * Endpointy POST /marketplace/publish i POST /marketplace/report wymagają JWT.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MarketplaceService {
@@ -83,9 +87,9 @@ public class MarketplaceService {
      * Na tym etapie zgłoszenie jest logowane — bez moderacji.
      *
      * @param request żądanie zgłoszenia z deckId i opcjonalnym powodem
-     * @throws DeckNotFoundException gdy talia nie istnieje
+     * @throws DeckNotFoundException gdy talia nie istnieje lub nie jest publiczna
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public void report(ReportRequest request) {
         Deck deck = deckRepository.findById(request.getDeckId())
                 .orElseThrow(() -> new DeckNotFoundException(request.getDeckId()));
@@ -94,9 +98,8 @@ public class MarketplaceService {
             throw new DeckNotFoundException(request.getDeckId());
         }
 
-        // Na tym etapie logujemy zgłoszenie — w przyszlosci mozna dodac tabele reports
-        System.out.printf("[REPORT] Deck id=%d zgłoszony przez użytkownika. Powód: %s%n",
-                deck.getId(), request.getReason() != null ? request.getReason() : "brak");
+        String reason = request.getReason() != null ? request.getReason() : "brak";
+        log.info("[REPORT] Deck id={} zgłoszony przez użytkownika. Powód: {}", deck.getId(), reason);
     }
 
     private MarketplaceDeckResponse toResponse(Deck deck) {
@@ -120,12 +123,18 @@ public class MarketplaceService {
         );
     }
 
+    /**
+     * Pobiera zalogowanego użytkownika z SecurityContext.
+     *
+     * @throws ResponseStatusException 401 gdy brak autentykacji w kontekście
+     * @throws ResponseStatusException 401 gdy użytkownik nie istnieje w bazie
+     */
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
-            throw new RuntimeException("No authentication found in security context");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No authentication found in security context");
         }
         return userRepository.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
     }
 }
