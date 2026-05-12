@@ -19,14 +19,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.flashlearn.R
 import com.example.flashlearn.data.remote.dto.StatsDto
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,15 +43,15 @@ fun StatsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Statystyki") },
+                title = { Text(stringResource(R.string.stats_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wróć")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.content_desc_back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.loadStats() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Odśwież")
+                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.content_desc_refresh))
                     }
                 }
             )
@@ -70,7 +74,7 @@ fun StatsScreen(
                         Text(state.message, color = MaterialTheme.colorScheme.error)
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = { viewModel.loadStats() }) {
-                            Text("Spróbuj ponownie")
+                            Text(stringResource(R.string.stats_btn_retry))
                         }
                     }
                 }
@@ -112,7 +116,7 @@ fun StreakCard(currentStreak: Int, longestStreak: Int) {
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                "🔥 Seria nauki", 
+                stringResource(R.string.stats_streak_title), 
                 style = MaterialTheme.typography.titleMedium, 
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -124,7 +128,7 @@ fun StreakCard(currentStreak: Int, longestStreak: Int) {
             ) {
                 StreakItem(
                     value = currentStreak,
-                    label = "Obecny",
+                    label = stringResource(R.string.stats_streak_current),
                     color = MaterialTheme.colorScheme.primary
                 )
                 Divider(
@@ -136,7 +140,7 @@ fun StreakCard(currentStreak: Int, longestStreak: Int) {
                 )
                 StreakItem(
                     value = longestStreak,
-                    label = "Najlepszy",
+                    label = stringResource(R.string.stats_streak_best),
                     color = MaterialTheme.colorScheme.tertiary
                 )
             }
@@ -185,14 +189,14 @@ fun MasteryCard(stats: StatsDto) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    "🎯 Opanowanie materiału", 
+                    stringResource(R.string.stats_mastery_title), 
                     style = MaterialTheme.typography.titleMedium, 
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Na podstawie ostatnich 30 dni",
+                    text = stringResource(R.string.stats_mastery_subtitle),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -201,9 +205,9 @@ fun MasteryCard(stats: StatsDto) {
                 // Legenda pionowa dla lepszej czytelności
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     val goodColor = Color(0xFF4CAF50) // Zielony kolor dla Dobrych
-                    RatingDot(color = goodColor, label = "$correct Dobre")
-                    RatingDot(color = MaterialTheme.colorScheme.secondary, label = "$hard Trudne")
-                    RatingDot(color = MaterialTheme.colorScheme.error, label = "$wrong Złe")
+                    RatingDot(color = goodColor, label = stringResource(R.string.stats_rate_good, correct))
+                    RatingDot(color = MaterialTheme.colorScheme.secondary, label = stringResource(R.string.stats_rate_hard, hard))
+                    RatingDot(color = MaterialTheme.colorScheme.error, label = stringResource(R.string.stats_rate_wrong, wrong))
                 }
             }
             Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(start = 16.dp)) {
@@ -313,7 +317,7 @@ fun BarChartCard(dataMap: Map<String, Long>) {
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                "📊 Fiszki w ostatnich 7 dniach", 
+                stringResource(R.string.stats_history_title), 
                 style = MaterialTheme.typography.titleMedium, 
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -326,7 +330,7 @@ fun BarChartCard(dataMap: Map<String, Long>) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "Brak danych za ostatnie 7 dni.", 
+                        stringResource(R.string.stats_history_empty), 
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -341,7 +345,8 @@ fun BarChartCard(dataMap: Map<String, Long>) {
             val data = last7Days.map { date ->
                 val dateStr = date.format(formatter)
                 val count = dataMap[dateStr] ?: 0L
-                val label = date.dayOfWeek.name.take(3).uppercase()
+                // Dynamiczne pobranie skrótu dnia dla obecnej lokalizacji urządzenia
+                val label = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()).uppercase()
                 Pair(label, count)
             }
 

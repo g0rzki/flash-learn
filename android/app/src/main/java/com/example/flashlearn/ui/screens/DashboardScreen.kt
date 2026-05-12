@@ -138,7 +138,7 @@ fun DashboardScreen(
             Icon(androidx.compose.material.icons.Icons.Default.DateRange, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Statystyki",
+                text = stringResource(R.string.stats_title),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
