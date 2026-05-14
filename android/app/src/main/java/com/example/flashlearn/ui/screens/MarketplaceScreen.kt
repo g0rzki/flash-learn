@@ -305,12 +305,15 @@ private fun MarketplaceDeckCard(
                         icon = Icons.Default.Style,
                         text = stringResource(R.string.marketplace_flashcard_count, deck.flashcardCount)
                     )
-                    // download_count
-                    DeckMetaChip(
-                        icon = Icons.Default.Download,
-                        text = deck.downloadCount.toString()
-                    )
                 }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // download_count (pod spodem)
+                DeckMetaChip(
+                    icon = Icons.Default.Download,
+                    text = deck.downloadCount.toString()
+                )
             }
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -440,7 +443,7 @@ private fun SkeletonDeckCard() {
                 Spacer(modifier = Modifier.height(8.dp))
                 // chipsy
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    repeat(3) {
+                    repeat(2) {
                         Box(
                             modifier = Modifier
                                 .width(56.dp)
@@ -450,6 +453,15 @@ private fun SkeletonDeckCard() {
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(4.dp))
+                // download chip placeholder (pod spodem)
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(18.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(shimmer)
+                )
             }
 
             Spacer(modifier = Modifier.width(8.dp))
