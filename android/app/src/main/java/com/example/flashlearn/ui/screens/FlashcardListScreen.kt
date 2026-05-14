@@ -1,5 +1,6 @@
 package com.example.flashlearn.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -7,17 +8,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.flashlearn.R
+import com.example.flashlearn.ui.deckdetail.DeckDetailViewModel
+import com.example.flashlearn.ui.deckdetail.FlashcardSortOrder
 import com.flashlearn.data.db.AppDatabase
 import com.flashlearn.data.entity.Flashcard
 import kotlinx.coroutines.launch
@@ -28,7 +32,8 @@ fun FlashcardListScreen(
     deckId: Long,
     onNavigateBack: () -> Unit,
     onNavigateToCreateFlashcard: () -> Unit,
-    onNavigateToEditFlashcard: (flashcardId: Long) -> Unit
+    onNavigateToEditFlashcard: (flashcardId: Long) -> Unit,
+    viewModel: DeckDetailViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val db = remember { AppDatabase.getInstance(context) }
@@ -36,7 +41,11 @@ fun FlashcardListScreen(
     val deckDao = remember { db.deckDao() }
     val scope = rememberCoroutineScope()
 
-    val flashcards by flashcardDao.observeByDeck(deckId).collectAsState(initial = emptyList())
+    // Odczyt posortowanej listy i kryterium z ViewModelu
+    val flashcards by viewModel.sortedFlashcards.collectAsState()
+    val sortOrder by viewModel.sortOrder.collectAsState()
+    var sortMenuExpanded by remember { mutableStateOf(false) }
+
     var deckTitle by remember { mutableStateOf("") }
     var flashcardToDelete by remember { mutableStateOf<Flashcard?>(null) }
 
@@ -57,8 +66,8 @@ fun FlashcardListScreen(
                     onClick = {
                         val target = flashcardToDelete!!
                         flashcardToDelete = null
-                        scope.launch { 
-                            flashcardDao.delete(target) 
+                        scope.launch {
+                            flashcardDao.delete(target)
                             com.example.flashlearn.sync.SyncManager(context.applicationContext).scheduleSync()
                         }
                     }
@@ -112,27 +121,98 @@ fun FlashcardListScreen(
                 EmptyFlashcardsState(onAddClick = onNavigateToCreateFlashcard)
             }
         } else {
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                    .padding(paddingValues)
             ) {
-                item {
+                // Sekcja z menu sortowania
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = stringResource(R.string.flashcards_count, flashcards.size),
+                        text = stringResource(R.string.sort_by_label),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Box {
+                        FilterChip(
+                            selected = true,
+                            onClick = { sortMenuExpanded = true },
+                            label = {
+                                val label = when (sortOrder) {
+                                    FlashcardSortOrder.DATE_DESC -> stringResource(R.string.sort_date_desc_short)
+                                    FlashcardSortOrder.ALPHABETICAL -> stringResource(R.string.sort_alphabetical_short)
+                                    FlashcardSortOrder.DIFFICULTY_ASC -> stringResource(R.string.sort_difficulty_asc_short)
+                                }
+                                Text(label)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Sort,
+                                    contentDescription = stringResource(R.string.content_desc_sort)
+                                )
+                            }
+                        )
+
+                        DropdownMenu(
+                            expanded = sortMenuExpanded,
+                            onDismissRequest = { sortMenuExpanded = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.sort_date_desc)) },
+                                onClick = {
+                                    viewModel.updateSortOrder(FlashcardSortOrder.DATE_DESC)
+                                    sortMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.sort_alphabetical)) },
+                                onClick = {
+                                    viewModel.updateSortOrder(FlashcardSortOrder.ALPHABETICAL)
+                                    sortMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.sort_difficulty_asc)) },
+                                onClick = {
+                                    viewModel.updateSortOrder(FlashcardSortOrder.DIFFICULTY_ASC)
+                                    sortMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
                 }
-                items(flashcards, key = { it.id }) { flashcard ->
-                    FlashcardItem(
-                        flashcard = flashcard,
-                        onClick = { onNavigateToEditFlashcard(flashcard.id) },
-                        onDeleteClick = { flashcardToDelete = flashcard }
-                    )
+
+                // Lista fiszek
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 16.dp, top = 0.dp, end = 16.dp, bottom = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.flashcards_count, flashcards.size),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    }
+                    items(flashcards, key = { it.id }) { flashcard ->
+                        FlashcardItem(
+                            flashcard = flashcard,
+                            onClick = { onNavigateToEditFlashcard(flashcard.id) },
+                            onDeleteClick = { flashcardToDelete = flashcard }
+                        )
+                    }
                 }
             }
         }
