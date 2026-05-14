@@ -111,6 +111,21 @@
     <!-- MarketplaceScreen -->
     <string name="marketplace_title">Marketplace</string>
     <string name="marketplace_subtitle">Przeglądaj i pobieraj publiczne talie</string>
+    <string name="marketplace_btn_clone">Klonuj</string>
+    <string name="marketplace_btn_refresh">Odśwież</string>
+    <string name="marketplace_flashcard_count">%1$d fiszek</string>
+    <string name="marketplace_clone_success">Talia dodana do Twoich talii!</string>
+    <string name="marketplace_clone_error">Błąd klonowania</string>
+    <string name="marketplace_empty_title">Brak wyników</string>
+    <string name="marketplace_empty_message">Brak publicznych talii dla wybranej kategorii. Spróbuj wybrać inną lub odśwież listę.</string>
+    <!-- Marketplace categories -->
+    <string name="marketplace_cat_all">Wszystkie</string>
+    <string name="marketplace_cat_languages">Języki</string>
+    <string name="marketplace_cat_programming">Programowanie</string>
+    <string name="marketplace_cat_math">Matematyka</string>
+    <string name="marketplace_cat_science">Nauki ścisłe</string>
+    <string name="marketplace_cat_history">Historia</string>
+    <string name="marketplace_cat_other">Inne</string>
 
     <!-- Offline / network banners -->
     <string name="offline_banner_message">Brak połączenia z internetem</string>

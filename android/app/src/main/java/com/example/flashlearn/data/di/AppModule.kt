@@ -7,10 +7,12 @@ import com.example.flashlearn.data.remote.AuthApiService
 import com.example.flashlearn.data.remote.RetrofitClient
 import com.example.flashlearn.data.remote.DeckApiService
 import com.example.flashlearn.data.remote.FlashcardApiService
+import com.example.flashlearn.data.remote.MarketplaceApiService
 import com.example.flashlearn.data.remote.StatsApiService
 import com.example.flashlearn.data.remote.SessionApiService
 import com.example.flashlearn.data.repository.DeckRepository
 import com.example.flashlearn.data.repository.FlashcardRepository
+import com.example.flashlearn.data.repository.MarketplaceRepository
 import com.example.flashlearn.data.repository.StatsRepository
 import com.example.flashlearn.data.repository.SessionRepository
 import com.example.flashlearn.domain.repository.AuthRepository
@@ -120,6 +122,21 @@ object AppModule {
         return SessionRepository(sessionApi)
     }
 
+    @Provides
+    @Singleton
+    fun provideMarketplaceApiService(): MarketplaceApiService {
+        return RetrofitClient.marketplaceApi
+    }
+
+    @Provides
+    @Singleton
+    fun provideMarketplaceRepository(
+        api: MarketplaceApiService,
+        deckDao: DeckDao,
+        flashcardDao: FlashcardDao
+    ): MarketplaceRepository {
+        return MarketplaceRepository(api, deckDao, flashcardDao)
+    }
     @Provides
     @Singleton
     fun provideSharedPreferences(
