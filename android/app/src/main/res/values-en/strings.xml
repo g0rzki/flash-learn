@@ -89,6 +89,9 @@
     <string name="deck_new_title">New deck</string>
     <string name="label_deck_name">Deck name</string>
     <string name="label_description_optional">Description (optional)</string>
+    <string name="label_category">Category</string>
+    <string name="category_none">No category</string>
+    <string name="category_loading">Loading categories…</string>
 
     <!-- FlashcardListScreen -->
     <string name="dialog_delete_flashcard_title">Delete flashcard</string>

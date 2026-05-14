@@ -89,6 +89,9 @@
     <string name="deck_new_title">Nowa talia</string>
     <string name="label_deck_name">Nazwa talii</string>
     <string name="label_description_optional">Opis (opcjonalny)</string>
+    <string name="label_category">Kategoria</string>
+    <string name="category_none">Bez kategorii</string>
+    <string name="category_loading">Ładowanie kategorii…</string>
 
     <!-- FlashcardListScreen -->
     <string name="dialog_delete_flashcard_title">Usuń fiszkę</string>
