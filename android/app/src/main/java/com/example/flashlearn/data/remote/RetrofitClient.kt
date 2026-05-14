@@ -63,4 +63,8 @@ object RetrofitClient {
     val sessionApi: SessionApiService
         get() = retrofit?.create(SessionApiService::class.java)
             ?: throw IllegalStateException("RetrofitClient not initialized. Call init(context) first.")
+
+    val marketplaceApi: MarketplaceApiService
+        get() = retrofit?.create(MarketplaceApiService::class.java)
+            ?: throw IllegalStateException("RetrofitClient not initialized. Call init(context) first.")
 }

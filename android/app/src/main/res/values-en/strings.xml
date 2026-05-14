@@ -111,6 +111,21 @@
     <!-- MarketplaceScreen -->
     <string name="marketplace_title">Marketplace</string>
     <string name="marketplace_subtitle">Browse and download public decks</string>
+    <string name="marketplace_btn_clone">Clone</string>
+    <string name="marketplace_btn_refresh">Refresh</string>
+    <string name="marketplace_flashcard_count">%1$d cards</string>
+    <string name="marketplace_clone_success">Deck added to your library!</string>
+    <string name="marketplace_clone_error">Clone error</string>
+    <string name="marketplace_empty_title">No results</string>
+    <string name="marketplace_empty_message">No public decks found for this category. Try another category or refresh the list.</string>
+    <!-- Marketplace categories -->
+    <string name="marketplace_cat_all">All</string>
+    <string name="marketplace_cat_languages">Languages</string>
+    <string name="marketplace_cat_programming">Programming</string>
+    <string name="marketplace_cat_math">Mathematics</string>
+    <string name="marketplace_cat_science">Sciences</string>
+    <string name="marketplace_cat_history">History</string>
+    <string name="marketplace_cat_other">Other</string>
 
     <!-- Offline / network banners -->
     <string name="offline_banner_message">No internet connection</string>
