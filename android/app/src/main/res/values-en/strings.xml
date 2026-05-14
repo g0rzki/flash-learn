@@ -172,6 +172,20 @@
     <string name="btn_app_settings">App settings</string>
 
 
+    <string name="sort_by_label">Sort by:</string>
+    <string name="sort_date_desc">Date added (Newest)</string>
+    <string name="sort_date_desc_short">Date added</string>
+    <string name="sort_alphabetical">Alphabetical (A-Z)</string>
+    <string name="sort_alphabetical_short">Alphabetical</string>
+    <string name="sort_difficulty_asc">Difficulty (Hardest)</string>
+    <string name="sort_difficulty_asc_short">Difficulty</string>
+    <string name="content_desc_sort">Sort</string>
+
+    <string name="settings_theme">App theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
 
 
     <!-- Stats Screen -->

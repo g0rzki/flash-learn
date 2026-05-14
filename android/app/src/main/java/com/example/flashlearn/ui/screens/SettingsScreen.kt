@@ -154,7 +154,13 @@ fun SettingsScreen(
                 HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
 
                 var themeExpanded by remember { mutableStateOf(false) }
-                val themes = listOf("system" to "Systemowy", "light" to "Jasny", "dark" to "Ciemny")
+
+                // Zmieniono na korzystanie z zasobów stringResource
+                val themes = listOf(
+                    "system" to stringResource(R.string.theme_system),
+                    "light" to stringResource(R.string.theme_light),
+                    "dark" to stringResource(R.string.theme_dark)
+                )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -162,14 +168,14 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Motyw aplikacji",
+                        text = stringResource(R.string.settings_theme), // Użycie stringResource
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onBackground
                     )
 
                     Box {
                         TextButton(onClick = { themeExpanded = true }) {
-                            Text(text = themes.find { it.first == uiState.theme }?.second ?: "Systemowy")
+                            Text(text = themes.find { it.first == uiState.theme }?.second ?: stringResource(R.string.theme_system))
                         }
                         DropdownMenu(
                             expanded = themeExpanded,
