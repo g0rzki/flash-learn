@@ -4,6 +4,7 @@ import com.example.flashlearn.data.remote.MarketplaceApiService
 import com.example.flashlearn.data.remote.dto.MarketplaceDeckDetailsDto
 import com.example.flashlearn.data.remote.dto.MarketplaceDeckDto
 import com.example.flashlearn.data.remote.dto.ReportRequestDto
+import com.example.flashlearn.data.remote.dto.SubmitDeckRequest
 import com.flashlearn.data.dao.DeckDao
 import com.flashlearn.data.dao.FlashcardDao
 import com.flashlearn.data.entity.Deck
@@ -90,5 +91,24 @@ class MarketplaceRepository @Inject constructor(
         }
     }
 
+
+    /**
+     * Publikuje talię użytkownika w Marketplace.
+     * @param deckServerId serverId talii (pole Room → wysyłane do backendu jako deckId)
+     * @param categoryId   id wybranej kategorii
+     * @param description  opcjonalny opis
+     */
+    suspend fun submitDeck(deckServerId: Long, categoryId: Long, description: String?) {
+        val response = api.submitDeck(
+            SubmitDeckRequest(
+                deckId = deckServerId,
+                categoryId = categoryId,
+                description = description?.takeIf { it.isNotBlank() }
+            )
+        )
+        if (!response.isSuccessful) {
+            error("Submit failed: ${response.code()}")
+        }
+    }
 }
 
