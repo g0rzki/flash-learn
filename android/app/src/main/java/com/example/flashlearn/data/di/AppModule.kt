@@ -9,6 +9,7 @@ import com.example.flashlearn.data.remote.RetrofitClient
 import com.example.flashlearn.data.remote.DeckApiService
 import com.example.flashlearn.data.remote.FlashcardApiService
 import com.example.flashlearn.data.remote.MarketplaceApiService
+import com.example.flashlearn.data.remote.ReportApiService
 import com.example.flashlearn.data.remote.StatsApiService
 import com.example.flashlearn.data.remote.SessionApiService
 import com.example.flashlearn.data.repository.CategoryRepository
@@ -60,7 +61,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDeckRepository(
-        deckDao: DeckDao, 
+        deckDao: DeckDao,
         syncManager: SyncManager,
         deckApi: DeckApiService
     ): DeckRepository =
@@ -69,8 +70,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFlashcardRepository(
-        flashcardDao: FlashcardDao, 
-        deckDao: DeckDao, 
+        flashcardDao: FlashcardDao,
+        deckDao: DeckDao,
         syncManager: SyncManager,
         flashcardApi: FlashcardApiService
     ): FlashcardRepository =
@@ -151,6 +152,7 @@ object AppModule {
     ): MarketplaceRepository {
         return MarketplaceRepository(api, deckDao, flashcardDao)
     }
+
     @Provides
     @Singleton
     fun provideSharedPreferences(
@@ -166,5 +168,11 @@ object AppModule {
         db: AppDatabase
     ): AuthRepository {
         return AuthRepositoryImpl(api, db)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReportApiService(): ReportApiService {
+        return RetrofitClient.reportApi
     }
 }
