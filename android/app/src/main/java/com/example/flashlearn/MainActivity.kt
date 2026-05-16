@@ -21,7 +21,8 @@ import com.example.flashlearn.ui.screens.FlashcardListScreen
 import com.example.flashlearn.ui.screens.LearnScreen
 import com.example.flashlearn.ui.screens.LoginScreen
 import com.example.flashlearn.ui.screens.MainScreen
-import com.example.flashlearn.ui.screens.MarketplaceDeckDetailScreen // Dodany import
+import com.example.flashlearn.ui.screens.MarketplaceDeckDetailScreen
+import com.example.flashlearn.ui.screens.PublishDeckScreen
 import com.example.flashlearn.ui.screens.RegisterScreen
 import com.example.flashlearn.ui.theme.FlashLearnTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,9 +45,7 @@ class MainActivity : AppCompatActivity() {
         ReminderScheduler.schedule(this, prefs)
         TokenManager.init(applicationContext)
 
-        val authprefs = applicationContext.getSharedPreferences("flashlearn_prefs", Context.MODE_PRIVATE)
-        // Poprawka 1: Użycie authprefs zamiast prefs do weryfikacji tokena
-        val hasToken = authprefs.getString("access_token", null) != null
+        val hasToken = TokenManager.isLoggedIn()
 
         enableEdgeToEdge()
         setContent {
@@ -139,7 +138,8 @@ class MainActivity : AppCompatActivity() {
                             onNavigateBack = { navController.popBackStack() },
                             onNavigateToEditDeck = { id -> navController.navigate("deck/edit/$id") },
                             onNavigateToLearn = { id -> navController.navigate("learn/$id") },
-                            onNavigateToFlashcards = { id -> navController.navigate("deck/$id/flashcards") }
+                            onNavigateToFlashcards = { id -> navController.navigate("deck/$id/flashcards") },
+                            onPublishToMarketplace = { id -> navController.navigate("deck/$id/publish") }
                         )
                     }
                     composable(
@@ -179,6 +179,14 @@ class MainActivity : AppCompatActivity() {
                         arguments = listOf(navArgument("flashcardId") { type = NavType.LongType })
                     ) {
                         FlashcardEditScreen(
+                            onNavigateBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable(
+                        route = "deck/{deckId}/publish",
+                        arguments = listOf(navArgument("deckId") { type = NavType.LongType })
+                    ) {
+                        PublishDeckScreen(
                             onNavigateBack = { navController.popBackStack() }
                         )
                     }

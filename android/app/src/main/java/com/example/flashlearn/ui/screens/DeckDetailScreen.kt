@@ -6,12 +6,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,12 +37,14 @@ fun DeckDetailScreen(
     onNavigateToEditDeck: (deckId: Long) -> Unit,
     onNavigateToLearn: (deckId: Long) -> Unit,
     onNavigateToFlashcards: (deckId: Long) -> Unit,
+    onPublishToMarketplace: (deckId: Long) -> Unit = {},
     viewModel: DeckDetailViewModel = hiltViewModel()
 ) {
     val deck by viewModel.deck.collectAsState()
     val totalFlashcards by viewModel.totalFlashcards.collectAsState()
     val dueTodayCount by viewModel.dueTodayCount.collectAsState()
     val masteryPercentage by viewModel.masteryPercentage.collectAsState()
+    var menuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -58,6 +64,26 @@ fun DeckDetailScreen(
                             imageVector = Icons.Default.Edit,
                             contentDescription = stringResource(R.string.content_desc_edit_deck)
                         )
+                    }
+                    Box {
+                        IconButton(onClick = { menuExpanded = true }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Więcej opcji"
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Opublikuj w Marketplace") },
+                                onClick = {
+                                    menuExpanded = false
+                                    onPublishToMarketplace(deckId)
+                                }
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

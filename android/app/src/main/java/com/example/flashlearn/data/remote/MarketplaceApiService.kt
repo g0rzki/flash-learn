@@ -4,6 +4,7 @@ import com.example.flashlearn.data.remote.dto.CloneResponseDto
 import com.example.flashlearn.data.remote.dto.MarketplaceDeckDetailsDto
 import com.example.flashlearn.data.remote.dto.MarketplacePageDto
 import com.example.flashlearn.data.remote.dto.ReportRequestDto
+import com.example.flashlearn.data.remote.dto.SubmitDeckRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -41,5 +42,13 @@ interface MarketplaceApiService {
     @POST("/marketplace/report")
     suspend fun reportDeck(@Body request: ReportRequestDto): Response<Void>
 
+
+    /**
+     * POST /marketplace/submit
+     * Publikuje wskazaną talię użytkownika w Marketplace.
+     * Odpowiedź: 200 OK (lub 201 Created, zależnie od backendu).
+     */
+    @POST("/marketplace/submit")
+    suspend fun submitDeck(@Body request: SubmitDeckRequest): Response<Unit>
 }
 
